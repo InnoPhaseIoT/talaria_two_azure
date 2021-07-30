@@ -61,7 +61,7 @@ After setting up the development environments following the above mentioned link
 - Create a new folder in any place and clone the 'talaria_two_azure' repo using below command.
 
 ``` bash
-$ git clone --recursive http://gitlab.innophaseinc.cc/vtiwari/talaria_two_azure
+$ git clone --recursive https://github.com/InnoPhaseInc/talaria_two_azure.git
 ```
 
 This repo uses [Git Submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules) for it's dependencies. The option '--recursive' is required to clone the various git submodule repos (and their own eventual submodule dependencies) needed by 'talaria_two_azure' repo.
