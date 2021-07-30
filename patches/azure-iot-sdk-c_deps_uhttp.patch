@@ -1,0 +1,15 @@
+diff --git a/src/uhttp.c b/src/uhttp.c
+index f8befcd..17d1e81 100644
+--- a/src/uhttp.c
++++ b/src/uhttp.c
+@@ -871,7 +871,9 @@ static int construct_http_headers(HTTP_HEADERS_HANDLE http_header, size_t conten
+             else
+             {
+                 /* Codes_SRS_UHTTP_07_015: [on_bytes_received shall add the Content-Length http header item to the request.] */
+-                if (sprintf(content, "%s: %u%s", HTTP_CONTENT_LEN, (unsigned int)content_len, HTTP_CRLF_VALUE) <= 0)
++                //if (sprintf(content, "%s: %u%s", HTTP_CONTENT_LEN, (unsigned int)content_len, HTTP_CRLF_VALUE) <= 0)
++                //T2 sprintf() can take only array as first argument, so, use snprintf() instead.
++                if (snprintf(content, fmtLen+1, "%s: %u%s", HTTP_CONTENT_LEN, (unsigned int)content_len, HTTP_CRLF_VALUE) <= 0)
+                 {
+                     result = MU_FAILURE;
+                     LogError("Failed allocating content len header data");

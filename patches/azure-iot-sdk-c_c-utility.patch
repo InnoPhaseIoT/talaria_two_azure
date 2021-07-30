@@ -1,0 +1,96 @@
+diff --git a/deps/azure-macro-utils-c b/deps/azure-macro-utils-c
+--- a/deps/azure-macro-utils-c
++++ b/deps/azure-macro-utils-c
+@@ -1 +1 @@
+-Subproject commit 5926caf4e42e98e730e6d03395788205649a3ada
++Subproject commit 5926caf4e42e98e730e6d03395788205649a3ada-dirty
+diff --git a/inc/azure_c_shared_utility/xlogging.h b/inc/azure_c_shared_utility/xlogging.h
+index a38a9b5d..471ed93f 100644
+--- a/inc/azure_c_shared_utility/xlogging.h
++++ b/inc/azure_c_shared_utility/xlogging.h
+@@ -110,9 +110,12 @@ typedef void(*LOGGER_LOG_GETLASTERROR)(const char* file, const char* func, int l
+ #if defined _MSC_VER
+ #ifndef LOGERROR_CAPTURES_STACK_TRACES
+ // ignore warning C4127 
++
++//for T2, change all printf() refrences to os_printf() 
++
+ #define LOG(log_category, log_options, format, ...) \
+ { \
+-    (void)(0 && printf(format, __VA_ARGS__)); \
++    (void)(0 && os_printf(format, __VA_ARGS__)); \
+     { \
+         LOGGER_LOG l = xlogging_get_log_function(); \
+         if (l != NULL) \
+@@ -128,7 +131,7 @@ typedef void(*LOGGER_LOG_GETLASTERROR)(const char* file, const char* func, int l
+ 
+ #define LOG_AZ_LOG_ERROR(log_category, log_options, format, ...)                                                                                                        \
+ {                                                                                                                                                                       \
+-    (void)(0 && printf(format, __VA_ARGS__));                                                                                                                           \
++    (void)(0 && os_printf(format, __VA_ARGS__));                                                                                                                           \
+     {                                                                                                                                                                   \
+         LOGGER_LOG l = xlogging_get_log_function();                                                                                                                     \
+         if (l != NULL)                                                                                                                                                  \
+@@ -163,7 +166,7 @@ typedef void(*LOGGER_LOG_GETLASTERROR)(const char* file, const char* func, int l
+ 
+ #define LOG_AZ_LOG_INFO(log_category, log_options, format, ...)                                                                                                         \
+ {                                                                                                                                                                       \
+-    (void)(0 && printf(format, __VA_ARGS__));                                                                                                                           \
++    (void)(0 && os_printf(format, __VA_ARGS__));                                                                                                                           \
+     {                                                                                                                                                                   \
+         LOGGER_LOG l = xlogging_get_log_function();                                                                                                                     \
+         if (l != NULL)                                                                                                                                                  \
+@@ -175,7 +178,13 @@ typedef void(*LOGGER_LOG_GETLASTERROR)(const char* file, const char* func, int l
+ 
+ #endif /*LOGERROR_CAPTURES_STACK_TRACES*/
+ #else
+-#define LOG(log_category, log_options, format, ...) { (void)(0 && printf(format, ##__VA_ARGS__)); { LOGGER_LOG l = xlogging_get_log_function(); if (l != NULL) l(log_category, __FILE__, FUNC_NAME, __LINE__, log_options, format, ##__VA_ARGS__); } }
++
++/*
++#define LOG(log_category, log_options, format, ...) { (void)(0 && os_printf(format, ##__VA_ARGS__)); { LOGGER_LOG l = xlogging_get_log_function(); if (l != NULL) l(log_category, __FILE__, FUNC_NAME, __LINE__, log_options, format, ##__VA_ARGS__); } }
++*/
++
++#define LOG(log_category, log_options, format, ...) { os_printf(format, ##__VA_ARGS__); { LOGGER_LOG l = xlogging_get_log_function(); if (l != NULL) l(log_category, __FILE__, FUNC_NAME, __LINE__, log_options, format, ##__VA_ARGS__); } }
++
+ #endif
+ 
+ #if defined _MSC_VER
+diff --git a/src/http_proxy_io.c b/src/http_proxy_io.c
+index 1e682dd5..a5ef538f 100644
+--- a/src/http_proxy_io.c
++++ b/src/http_proxy_io.c
+@@ -327,7 +327,9 @@ static void on_underlying_io_open_complete(void* context, IO_OPEN_RESULT open_re
+                             /* Codes_SRS_HTTP_PROXY_IO_01_091: [ To receive authorization, the client sends the userid and password, separated by a single colon (":") character, within a base64 [7] encoded string in the credentials. ]*/
+                             /* Codes_SRS_HTTP_PROXY_IO_01_092: [ A client MAY preemptively send the corresponding Authorization header with requests for resources in that space without receipt of another challenge from the server. ]*/
+                             /* Codes_SRS_HTTP_PROXY_IO_01_093: [ Userids might be case sensitive. ]*/
+-                            if (sprintf(plain_auth_string_bytes, "%s:%s", http_proxy_io_instance->username, (http_proxy_io_instance->password == NULL) ? "" : http_proxy_io_instance->password) < 0)
++                            //if (sprintf(plain_auth_string_bytes, "%s:%s", http_proxy_io_instance->username, (http_proxy_io_instance->password == NULL) ? "" : http_proxy_io_instance->password) < 0)
++                            //T2 sprintf() can take only array as first argument, so, use snprintf() instead.
++                            if (snprintf(plain_auth_string_bytes, plain_auth_string_length + 1, "%s:%s", http_proxy_io_instance->username, (http_proxy_io_instance->password == NULL) ? "" : http_proxy_io_instance->password) < 0)
+                             {
+                                 /* Codes_SRS_HTTP_PROXY_IO_01_062: [ If any failure is encountered while constructing the request, the on_open_complete callback shall be triggered with IO_OPEN_ERROR, passing also the on_open_complete_context argument as context. ]*/
+                                 encoded_auth_string = NULL;
+@@ -401,6 +403,7 @@ static void on_underlying_io_open_complete(void* context, IO_OPEN_RESULT open_re
+                         else
+                         {
+                             /* Codes_SRS_HTTP_PROXY_IO_01_059: [ - If username and password have been specified in the arguments passed to http_proxy_io_create, then the header Proxy-Authorization shall be added to the request. ]*/
++                            /*
+                             connect_request_length = sprintf(connect_request, request_format,
+                                 http_proxy_io_instance->hostname,
+                                 http_proxy_io_instance->port,
+@@ -408,6 +411,15 @@ static void on_underlying_io_open_complete(void* context, IO_OPEN_RESULT open_re
+                                 http_proxy_io_instance->port,
+                                 (http_proxy_io_instance->username != NULL) ? proxy_basic : "",
+                                 auth_string_payload);
++                            */
++                            //T2 sprintf() can take only array as first argument, so, use snprintf() instead.
++                            connect_request_length = snprintf(connect_request, connect_request_length + 1, request_format,
++                                http_proxy_io_instance->hostname,
++                                http_proxy_io_instance->port,
++                                http_proxy_io_instance->hostname,
++                                http_proxy_io_instance->port,
++                                (http_proxy_io_instance->username != NULL) ? proxy_basic : "",
++                                auth_string_payload);
+ 
+                             if (connect_request_length < 0)
+                             {

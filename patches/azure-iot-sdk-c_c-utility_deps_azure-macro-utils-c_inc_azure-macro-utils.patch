@@ -1,0 +1,17 @@
+diff --git a/inc/azure_macro_utils/macro_utils.h b/inc/azure_macro_utils/macro_utils.h
+index 2a91533..0db1616 100644
+--- a/inc/azure_macro_utils/macro_utils.h
++++ b/inc/azure_macro_utils/macro_utils.h
+@@ -21,6 +21,12 @@ extern "C" {
+     #define MU_FAILURE __LINE__
+ #endif
+ 
++//using T2's libc's equivalent functions
++#define free(_ptr)              os_free((_ptr))
++#define malloc(_size)           os_alloc((_size))
++#define realloc(_nmemb, _size)  os_realloc((_nmemb), (_size))
++#define calloc(_nmemb, _size)   os_calloc((_nmemb), (_size))
++
+ /*"pointer or NULL" macro - because when printf-ing arguments NULL is not valid for %s (section 7.1.4 of C11 standard) */
+ #define MU_P_OR_NULL(p) (((p)!=NULL)?(p):"NULL")
+ #define MU_WP_OR_NULL(p) (((p)!=NULL)?(p):L"NULL")
