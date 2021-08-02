@@ -21,7 +21,7 @@ Output will be similar to:
 }
 ```
 
-- open the file 'sdk_path/embedded_apps/apps/talaria_two_azure/examples/iothub_client_sample_mqtt/main/iothub_client_sample_mqtt.c'
+- open the file `<sdk_path>/apps/talaria_two_azure/examples/iothub_client_sample_mqtt/main/iothub_client_sample_mqtt.c`
 
 - In this file, populate the macro 'EXAMPLE_IOTHUB_CONNECTION_STRING' (shown below) with the connection string of your device copied in previous steps.
 
@@ -37,13 +37,22 @@ Do a `make clean` and run `make` for generating the binaries for `Azure IoT HUB 
 - Using Talaria TWO Download Tool, program the EVB-A with the example binary 'iothub_client_mqtt_sample.elf' giving the ssid and passphrase of your access point. No other boot arguments are needed to run this example. Details on how to use the Download Tool can be found in the repo [README](../../README.md#creating-an-azure-iot-device) document.
 
 
-- Azure CLI with IoT extension can be used for monitoring the events using the following:
+- Azure CLI with IoT extension can be used for monitoring the events.
+
+Name and connection string of your IoT Hub will be needed as parameters for Azure CLI command for monitoring the events of tha specific Hub.
+(Please note that the connection string of the IoT Hub is different than the connection string of the device we used in previous step to configure in file 'iothub_client_sample_mqtt.c').
+
+The connection string of your IoT Hub can be found from the Azure Portal as detailed below: 
+Click on your IoT Hub > Shared access policies > iothubowner > connection string-primary key > Copy to clipboard
+
+Then use your Hub name and this connection string from the above step, in the following Azure CLI command to start the monitoring:
 
 ```
 $ az iot hub monitor-events -n [IoTHub Name] --login '[Connection string - primary key]'
 ```
 
 - After the device gets the internet connectivity, publishing MQTT messages are published by the device. The Azure IoT monitor shell will capture it as below:
+(Actual logs will reflect names of the Hub, devices you have actually used. Example logs provided here are just for reference.)
 
 ```
 {

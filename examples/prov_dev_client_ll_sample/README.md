@@ -47,7 +47,7 @@ More details with the screenshots about these steps can be found [here](https://
 
 ### Device Configuration
 
-For this method, we will need to populate `ID Scope`, `Registration ID` and `Symmetric Key` in the file `prov_dev_client_ll_sample.c`.
+For this method, we will need to populate `ID Scope`, `Registration ID` and `Symmetric Key` in the file `<sdk_path>/apps/talaria_two_azure/examples/prov_dev_client_ll_sample/main/prov_dev_client_ll_sample.c`. 
 
 In this file search for the function `prov_dev_client_ll_sample_run()`. Here you will find the code :
 
@@ -65,7 +65,7 @@ to populate this, as shown below for example -
 
 Now, copy the ID Scope of the Device Provisioning Service we created. This can be found on the Azure portal under the "Overview" section of DPS.
 
-Then in the same file `prov_dev_client_ll_sample.c`, searching for `id_scope` you will find the code :
+Then in the same file `<sdk_path>/apps/talaria_two_azure/examples/prov_dev_client_ll_sample/main/prov_dev_client_ll_sample.c`, searching for `id_scope` you will find the code :
 
 ```
 static const char* id_scope = "XXXXXXXXXXX";
@@ -86,7 +86,8 @@ Using Talaria TWO Download Tool, program the EVB-A with the example binary 'prov
 After running the provisioning application successfully, in the Talaria TWO Console you will notice the logs detailed below :
 - The device connects to the DPS server with the `ID Scope` and communicates with the enrollment entity named `Registration ID` we provided.
 
-For our example names we used / created in this document, you will notice below logs among other appearing logs :
+For the example names of IoT Hub, devices, DPS ID Scope and enrollment we used / created in this document, you will notice below logs among other appearing logs :
+(Actual logs will reflect names of the Hub, devices, ID Scope and DPS enrollment you have actually used. Example logs provided here are just for reference.)
 
 A connection with the username :
 ```
@@ -124,7 +125,7 @@ After this,
 - exchanges a few messages with this device just to confirm the connectivity.
 - disconnects again.
 
-Among other logs, you will notice the below username and few exchanges in this reconnection part of the run to showcase the points listed above:
+Among other logs, you will notice the below exchanges in this reconnection part of the run to showcase the points listed above:
 
 ```
 .
@@ -166,7 +167,7 @@ Refer [this azure documentation](https://docs.microsoft.com/en-us/azure/iot-hub/
 ### Certificate Generation (ECC)
 - For the example purpose, [OpenSSL](https://www.openssl.org/) will be used for certificate generation. [Download](https://www.openssl.org/source/) and install openSSL.
 - Below commands are tested with Ubuntu machine. For other systems or packages other than OpenSSL, please check for the equivalent commands for similar operations as listed below.
-- Make a new directory and copy the file `x509_config.cfg` from the path `talaria_two_azure/tools/OpenSSL_ECC_Config/` to this newly created directory. Then use following steps:
+- Make a new directory and copy the file `x509_config.cfg` from the path `<sdk_path>/apps/talaria_two_azure/tools/OpenSSL_ECC_Config/` to this newly created directory. Then use following steps:
 
 	- Generate a Root CA private key
 
@@ -247,13 +248,13 @@ You will notice that an enrollment entity has been created with the same name we
 ### Device Configuration
 
 For this method, we will need to populate 
-- `ID Scope` in the file `prov_dev_client_ll_sample.c`
-- `COMMON_NAME` in the file `custom_hsm.c`
-- `leaf_cert_pem_start[]` and `leaf_pv_key_pem_start[]` in file `/examples/prov_dev_client_ll_sample/main/certs/certs.c`
+- `ID Scope` in the file `<sdk_path>/apps/talaria_two_azure/examples/prov_dev_client_ll_sample/main/prov_dev_client_ll_sample.c`
+- `COMMON_NAME` in the file `<sdk_path>/apps/talaria_two_azure/examples/prov_dev_client_ll_sample/main/custom_hsm.c`
+- `leaf_cert_pem_start[]` and `leaf_pv_key_pem_start[]` in file `<sdk_path>/apps/talaria_two_azure/examples/prov_dev_client_ll_sample/main/certs/certs.c`
 
 Copy the ID Scope of the Device Provisioning Service we created. This can be found on the Azure portal under the "Overview" section of DPS.
 
-Then in the file `prov_dev_client_ll_sample.c`, searching for `id_scope` you will find the code :
+Then in the file `<sdk_path>/apps/talaria_two_azure/examples/prov_dev_client_ll_sample/main/prov_dev_client_ll_sample.c`, searching for `id_scope` you will find the code :
 
 ```
 static const char* id_scope = "XXXXXXXXXXX";
@@ -265,7 +266,7 @@ For example
 static const char* id_scope = "0ne001E4235";
 ```
 
-The name of the Enrollment Entity we created in previous step is to be populated in below portion of file `custom_hsm.c`.
+The name of the Enrollment Entity we created in previous step is to be populated in below portion of file `<sdk_path>/apps/talaria_two_azure/examples/prov_dev_client_ll_sample/main/custom_hsm.c`.
 ```
 static const char* const COMMON_NAME = "XXYYZZ";
 ```
@@ -276,10 +277,10 @@ For Example --
 static const char* const COMMON_NAME = "InnoProvServiceECC";
 ```
 
-In the file `/examples/prov_dev_client_ll_sample/main/certs/certs.c`, `leaf_cert_pem_start[]` and `leaf_pv_key_pem_start[]` are to be populated with the contents from 
+In the file `<sdk_path>/apps/talaria_two_azure/examples/prov_dev_client_ll_sample/main/certs/certs.c`, content of `leaf_cert_pem_start[]` and `leaf_pv_key_pem_start[]` are to be populated with the contents from 
 `leaf_private_key.pem` and `leaf_certificate.pem` we created earlier.
 
-The way to populate is shown in the example file '/certs/ecc_example_certs.c'
+The way to populate this is shown in the example file `<sdk_path>/apps/talaria_two_azure/examples/prov_dev_client_ll_sample/main/certs/ecc_example_certs.c`
 
 Confirm that these needed changes are in place and files saved
 Now, do a `make clean` and then run `make build_type=prov_build_with_x509` for generating `Azure IoT Hub Device Provisioning Service Sample` provisioning build with HSM_TYPE_X509.
@@ -291,7 +292,8 @@ Using Talaria TWO Download Tool, program the EVB-A with the example binary 'prov
 After running the provisioning application successfully, in the Talaria TWO Console you will notice the logs detailed below :
 - The device connects to the DPS server with the `ID Scope` and communicates with the enrollment entity named in `COMMON_NAME` of 'leaf.csr' we provided.
 
-For our example names we used / created in this document, you will notice below logs among other appearing logs :
+For the example names of IoT Hub, devices, DPS ID Scope and enrollment we used / created in this document, you will notice below logs among other appearing logs :
+(Actual logs will reflect names of the Hub, devices, ID Scope and DPS enrollment you have actually used. Example logs provided here are just for reference.)
 
 A connection with the username :
 ```
@@ -329,7 +331,7 @@ After this,
 - exchanges a few messages with this device just to confirm the connectivity.
 - disconnects again.
 
-Among other logs, you will notice the below username and few exchanges in this reconnection part of the run to showcase the points listed above:
+Among other logs, you will notice the below exchanges in this reconnection part of the run to showcase the points listed above:
 
 ```
 .
@@ -406,14 +408,15 @@ All this, means the provisioning using X.509 CA Certificate based device enrollm
 	```
 	static const char* const COMMON_NAME = "InnoProvServiceRSA";
 	```
-	We will have to use the content from `leaf_private_key.pem` and `leaf_certificate.pem` generated from this RSA steps to populate '/certs/certs.c'.
-	(Similar to the way shown in the example file '/certs/rsa_example_certs.c'.)
+	We will have to use the content from `leaf_private_key.pem` and `leaf_certificate.pem` generated from RSA specific steps to populate the file--
+	`<sdk_path>/apps/talaria_two_azure/examples/prov_dev_client_ll_sample/main/certs/certs.c`.
+	(Similar to the way shown in the example file `<sdk_path>/apps/talaria_two_azure/examples/prov_dev_client_ll_sample/main/certs/rsa_example_certs.c`.)
 
 	All other steps are similar. For this RSA example, in enrollment step we can enter `IoT Hub Device ID`: as `InnoProvServiceRSA_Device-001`
 
 	All the logs will now reflect these changes when successful provisioning and device creation happens.
 
-### For building various Samples
+### Building the binaries for the Sample Apps
 
 - For Provisioning builds
 	- do a `make clean` and run `make build_type=prov_build_with_symm_key` for a provisioning build with HSM_TYPE_SYMM_KEY

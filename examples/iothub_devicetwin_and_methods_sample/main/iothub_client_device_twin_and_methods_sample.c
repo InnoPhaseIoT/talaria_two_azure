@@ -195,7 +195,9 @@ static int deviceMethodCallback(const char* method_name, const unsigned char* pa
     (void)payload;
     (void)size;
 
-    os_printf("Method Name: %s\n", method_name);
+    os_printf("\n Method Name: %s\n", method_name);
+    os_printf("\n Payload: %s\n", payload);
+
     int result;
     if (strcmp("getCarVIN", method_name) == 0)
     {
@@ -245,7 +247,7 @@ static void deviceTwinCallback(DEVICE_TWIN_UPDATE_STATE update_state, const unsi
 
             if (oldCar->changeOilReminder == NULL)
             {
-                os_printf("Received a new changeOilReminder = %s\n", newCar->changeOilReminder);
+                os_printf("\n Received a new changeOilReminder = %s\n", newCar->changeOilReminder);
                 if ( NULL != (oldCar->changeOilReminder = malloc(strlen(newCar->changeOilReminder) + 1)))
                 {
                     (void)strcpy(oldCar->changeOilReminder, newCar->changeOilReminder);
@@ -258,7 +260,7 @@ static void deviceTwinCallback(DEVICE_TWIN_UPDATE_STATE update_state, const unsi
         {
             if (newCar->settings.desired_maxSpeed != oldCar->settings.desired_maxSpeed)
             {
-                os_printf("Received a new desired_maxSpeed = %" PRIu8 "\n", newCar->settings.desired_maxSpeed);
+                os_printf("\n Received a new desired_maxSpeed = %" PRIu8 "\n", newCar->settings.desired_maxSpeed);
                 oldCar->settings.desired_maxSpeed = newCar->settings.desired_maxSpeed;
             }
         }
@@ -267,7 +269,7 @@ static void deviceTwinCallback(DEVICE_TWIN_UPDATE_STATE update_state, const unsi
         {
             if (newCar->settings.location.latitude != oldCar->settings.location.latitude)
             {
-                os_printf("Received a new latitude = %d\n", newCar->settings.location.latitude);
+                os_printf("\n Received a new latitude = %d\n", newCar->settings.location.latitude);
                 oldCar->settings.location.latitude = newCar->settings.location.latitude;
             }
         }
@@ -276,7 +278,7 @@ static void deviceTwinCallback(DEVICE_TWIN_UPDATE_STATE update_state, const unsi
         {
             if (newCar->settings.location.longitude != oldCar->settings.location.longitude)
             {
-                os_printf("Received a new longitude = %d\n", newCar->settings.location.longitude);
+                os_printf("\n Received a new longitude = %d\n", newCar->settings.location.longitude);
                 oldCar->settings.location.longitude = newCar->settings.location.longitude;
             }
         }
@@ -292,7 +294,7 @@ static void deviceTwinCallback(DEVICE_TWIN_UPDATE_STATE update_state, const unsi
 static void reportedStateCallback(int status_code, void* userContextCallback)
 {
     (void)userContextCallback;
-    os_printf("Device Twin reported properties update completed with result: %d\r\n", status_code);
+    os_printf("\n Device Twin reported properties update completed with result: %d\r\n", status_code);
 }
 
 

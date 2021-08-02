@@ -21,7 +21,7 @@ Output will be similar to:
 }
 ```
 
-- open the file 'sdk_path/embedded_apps/apps/talaria_two_azure/examples/iothub_devicetwin_and_methods_sample/main/iothub_client_device_twin_and_methods_sample.c'
+- open the file `<sdk_path>/apps/talaria_two_azure/examples/iothub_devicetwin_and_methods_sample/main/iothub_client_device_twin_and_methods_sample.c`
 
 - In this file, populate the macro 'CONFIG_IOTHUB_CONNECTION_STRING' (shown below) with the connection string of your device copied in previous steps.
 
@@ -120,6 +120,7 @@ Before running this Sample Application, navigate to `Azure Portal` -> `your IoT 
 ```
 
 Once the Sample App is run, please notice the logs in the Talaria TWO Console output -
+(Actual logs will reflect names of the Hub, devices you have actually used. Example logs provided here are just for reference.)
 
 ```
 Device Twin reported properties update completed with result: 204

@@ -67,15 +67,16 @@ $ git clone --recursive https://github.com/InnoPhaseInc/talaria_two_azure.git
 This repo uses [Git Submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules) for it's dependencies. The option '--recursive' is required to clone the various git submodule repos (and their own eventual submodule dependencies) needed by 'talaria_two_azure' repo.
 
 
-Once the clone is complete, move the folder 'talaria_two_azure' to the path 'embedded_apps/apps/'.
+Once the clone is complete, move the folder 'talaria_two_azure' to the path `<sdk_path>/apps/`.
 
 Then go to the directory 'talaria_two_azure' and run the below script. This needs to be done only once, after the clone is successful.
 ``` bash
-<sdk_path>/embedded_apps/apps/talaria_two_azure$ sh apply_t2_libc_compatibility_patches.sh
+<sdk_path>/apps/talaria_two_azure$ sh apply_t2_libc_compatibility_patches.sh
 ```
 
-Once the above command is run successfully, running Make from here will create binaries in the path 'talaria_two_azure/out'.
+Once the above command is run successfully, running Make from here will create binaries in the path 'talaria_two_azure/out', explained below.
 
+### Building the binaries for the Sample Apps
 How to use Make to build binaries for different sample applications, is explained below
 
 - For Provisioning builds
@@ -103,7 +104,7 @@ Please follow the README.md of each individual example for the further details r
 
 ### Setting up Azure IoT Hub
 
-- Follow the documentation ['Create an IoT hub using the Azure portal'](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) to create an Azure IoT Hub.
+- Follow the documentation ['Create an IoT hub using the Azure portal'](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) to create an Azure IoT Hub and Devices.
 
 
 > *Note: There is an option to select , F1: Free tier, when choosing the "Pricing and scale tier". For evaluation purpose, this should be enough to use.*
@@ -129,7 +130,13 @@ Please follow the README.md of each individual example for the further details r
 To monitor various events / data being exchanged between the Talaria TWO device and Azure IoT hub, from PC command line, run the following command:
 
  `$ az iot hub monitor-events -n [IoTHub Name] --login '[Connection string - primary key]'`
- 
- 
+
+Name and connection string of your IoT Hub will be needed as parameters for Azure this CLI command for monitoring the events of tha specific Hub.
+
+The connection string of your IoT Hub can be found from the Azure Portal as detailed below: 
+Click on your IoT Hub > Shared access policies > iothubowner > connection string-primary key > Copy to clipboard
+
+Then use your Hub name and this connection string from the above step, in the Azure CLI command to start the monitoring.
+
 Now run any of the sample applications on Talaria TWO to see the events monitored on Azure CLI.
 
