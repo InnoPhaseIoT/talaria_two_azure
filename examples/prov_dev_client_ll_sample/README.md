@@ -161,11 +161,13 @@ All this, means the provisioning using Symmetric Key based device enrollment, wa
 
 ## Provisioning using X.509 CA Certificates based attestation
 Please note that X.509 based attestation is possible with RSA and ECC both options. For the detailed sequence, we will follow the ECC example.
-The equivalent steps for RSA will be provided as a note towards the end of this section.
+However, most of the steps for both ECC and RSA attestation are exactly the same. The only difference is in the ECC and RSA specific OpenSSL commands we use for generating the key and the certificates.
+Only these specific steps (which are different) are provided as a note towards the end of this section for the users to achieve DPS using RSA.
+
 Refer [this azure documentation](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-x509ca-overview) to learn more about X.509 CA Certificates on Azure.
 
 ### Certificate Generation (ECC)
-- For the example purpose, [OpenSSL](https://www.openssl.org/) will be used for certificate generation. [Download](https://www.openssl.org/source/) and install openSSL.
+- For the example purpose, [OpenSSL](https://www.openssl.org/) will be used for certificate generation. [Download](https://www.openssl.org/source/) and install OpenSSL.
 - Below commands are tested with Ubuntu machine. For other systems or packages other than OpenSSL, please check for the equivalent commands for similar operations as listed below.
 - Make a new directory and copy the file `x509_config.cfg` from the path `<sdk_path>/apps/talaria_two_azure/tools/OpenSSL_ECC_Config/` to this newly created directory. Then use following steps:
 
@@ -367,9 +369,9 @@ All this, means the provisioning using X.509 CA Certificate based device enrollm
 
 ### Notes
 
-#### The equivalent steps for RSA
+#### RSA Specific OpenSSL key and cert generation steps
 
-- In the example above, we have covered the OpenSSL commands for ECC. The equivalent steps and variations to replicate the same for the RSA is detailed below :
+- In the example above, we have covered the OpenSSL commands for key and certificate generation for ECC. The equivalent steps and variations to achieve provisioning for the RSA is detailed below :
 
 	- Generate a Root CA private key
 
@@ -401,9 +403,19 @@ All this, means the provisioning using X.509 CA Certificate based device enrollm
 
 	For this example's purpose, let's give CN as `InnoProvServiceRSA`.
 
-	Uploading this leaf_private_key.pem, the enrollment entity will be created with the name `InnoProvServiceRSA`.
+	Apart from the steps listed above, all the other steps (device configuration, enrollment etc) for RSA are exactly the same as what we followed for the ECC example.
 
-	Hence we will have to populate this name in `custom_hsm.c` as shown below :
+	For example, using the 'leaf.csr' we just created in the above step, we will need to create `leaf_certificate.pem` following exactly the same way we used for the ECC example.
+
+	- Generate device certificate (leaf certificate):
+	```
+	$ openssl x509 -req -in leaf.csr -CA rootCA.pem -CAkey rootCA.key -days 1024 -CAcreateserial -out leaf_certificate.pem
+	```
+
+	Now, following the next steps in same way as detailed in the ECC example and uploading this `leaf_certificate.pem`, the enrollment entity will be created with the name `InnoProvServiceRSA`.
+	(as this is CN we gave in the RSA specific steps here.)
+
+	Hence we will have to populate this name in `custom_hsm.c` now, as shown below :
 
 	```
 	static const char* const COMMON_NAME = "InnoProvServiceRSA";
@@ -412,9 +424,11 @@ All this, means the provisioning using X.509 CA Certificate based device enrollm
 	`<sdk_path>/apps/talaria_two_azure/examples/prov_dev_client_ll_sample/main/certs/certs.c`.
 	(Similar to the way shown in the example file `<sdk_path>/apps/talaria_two_azure/examples/prov_dev_client_ll_sample/main/certs/rsa_example_certs.c`.)
 
-	All other steps are similar. For this RSA example, in enrollment step we can enter `IoT Hub Device ID`: as `InnoProvServiceRSA_Device-001`
+	Please Note : All other steps not specifically detailed in this RSA specific section are exactly the same as already covered in the ECC example in great details.
+	(for example populating `id_scope` in device config section, etc). Only the key and certificate generation and the names we use for examples are changed here.
 
-	All the logs will now reflect these changes when successful provisioning and device creation happens.
+	Eg, in this RSA example, in the enrollment step we can provide, `IoT Hub Device ID` filed: as, lets say,  `InnoProvServiceRSA_Device-001` reflecting the names we used specific to this RSA section.
+	Then, all the logs will now reflect these changes when successful provisioning and device creation happens.
 
 ### Building the binaries for the Sample Apps
 
