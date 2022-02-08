@@ -6,6 +6,7 @@
 - [Getting Started with the SDK](#get-started)
 - [Creating an Azure IoT Device](#create-device)
 - [Monitoring Results](#monitoring)
+- [Releases](#releases)
 
 ## Introduction
 
@@ -139,4 +140,44 @@ Click on your IoT Hub > Shared access policies > iothubowner > connection string
 Then use your Hub name and this connection string from the above step, in the Azure CLI command to start the monitoring.
 
 Now run any of the sample applications on Talaria TWO to see the events monitored on Azure CLI.
+
+
+## Releases
+
+<a name="releases"></a>
+
+New features and bug fixes are offered by both the SDKs (Talaria TWO SDK and Azure IoT SDC C).
+
+When a new SDK for Talaria TWO is released, a release from this Repo will be made to support that.
+
+Also, when a new LTS version is ported from Azure IoT SDC C, a release from this Repo will be made to support that.
+
+Releases made from this Repo will be 'tagged-releases' and each release-tag will have the relevant info about respective Talaria TWO SDK version and Azure IoT C SDK LTS version supported by that particular release from this Repo.
+
+### For Example
+
+Tag "v1.0.0_TalariaTWO_SDK_2.3" has the folloing description --
+```
+builds with - 'Talaria TWO SDK 2.3'
+
+based on - azure-iot-sdk-c - LTS_07_2020_Ref02
+```
+and
+
+Tag "v1.1.0_TalariaTWO_SDK_2.4" has the folloing description --
+```
+builds with - 'Talaria TWO SDK 2.4'
+
+based on - azure-iot-sdk-c - LTS_07_2020_Ref02
+```
+The versioning `vx.y.z_TalariaTWO_SDK_m.n.o` follows semantic versioning, vx.y.z. or major.minor.patch.
+
+Supported Talaria TWO SDK version is added with a `_TalariaTWO_SDK_m.n.o` to `vx.y.z`.
+
+A port to a newer LTS version from Azure IoT SDC C will bump the major version `x` and reset the minor version `y` and patch version `z` to 0.
+
+A new TalariaTWO SDK Release support will bump the minor version `y` and reset the patch version `z` to 0, while the majot version `x` remains the same.
+
+A critical bug fix will bump the patch version `z` only.
+
 
