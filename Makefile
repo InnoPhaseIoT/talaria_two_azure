@@ -5,7 +5,8 @@ SDK_DIR ?= $(ROOT_LOC)
 include $(ROOT_LOC)/build.mak
 include $(SDK_DIR)/conf/sdk.mak
 
-lib_path=lib
+lib_azure_iot_sdk_path=lib/azure_iot_sdk/
+lib_azure_iot_sdk_pal_path=lib/azure_iot_sdk_pal/
 
 azure_sdk_c-utility_src=azure-iot-sdk-c/c-utility/src/
 azure_sdk_c-utility_pal=azure-iot-sdk-c/c-utility/pal/
@@ -101,7 +102,8 @@ endif
 
 
 CFLAGS += -Wno-maybe-uninitialized
-LDFLAGS += -L$(objdir)/${lib_path}
+LDFLAGS += -L$(objdir)/${lib_azure_iot_sdk_path}
+LDFLAGS += -L$(objdir)/${lib_azure_iot_sdk_pal_path}
 LDFLAGS += --no-gc-sections
 
 ifeq ($(build_type),prov_build_with_symm_key)
@@ -120,7 +122,8 @@ endif
 
 targets=$(addprefix $(objdir)/,$(apps))
 
-all: libcomponents $(objdir)/${lib_path}/libazure_iot_sdk_t2.a $(targets)
+all: libcomponents $(objdir)/${lib_azure_iot_sdk_path}/libazure_iot_sdk_t2.a \
+        $(objdir)/${lib_azure_iot_sdk_pal_path}/libazure_iot_sdk_t2_pal.a  $(targets)
 $(targets) : $(COMMON_FILES)
 
 #SRCS_C_UTIL
@@ -133,8 +136,6 @@ azure_iot_srcs_c_util = \
         ${azure_sdk_c-utility_src}gb_stdio.o ${azure_sdk_c-utility_src}gb_time.o \
         ${azure_sdk_c-utility_src}hmac.o  ${azure_sdk_c-utility_src}hmacsha256.o \
         ${azure_sdk_c-utility_adapters}linux_time.o \
-        ${azure_sdk_pal}tickcounter_t2.o ${azure_sdk_pal}threadapi_t2.o ${azure_sdk_pal}lock_t2.o ${azure_sdk_pal}agenttime_t2.o \
-        ${azure_sdk_pal}tlsio_t2.o ${azure_sdk_pal}platform_t2.o ${azure_sdk_pal}sntp.o ${azure_sdk_pal}certs.o ${azure_sdk_pal}t2_ntp.o \
         ${azure_sdk_c-utility_pal}tlsio_options.o ${azure_sdk_c-utility_src}map.o \
         ${azure_sdk_c-utility_src}map.o \
         ${azure_sdk_c-utility_src}optionhandler.o ${azure_sdk_c-utility_src}sastoken.o \
@@ -145,7 +146,12 @@ azure_iot_srcs_c_util = \
         ${azure_sdk_c-utility_src}usha.o \
         ${azure_sdk_c-utility_src}vector.o \
         ${azure_sdk_c-utility_src}xio.o ${azure_sdk_c-utility_src}http_proxy_io.o \
-        ${azure_sdk_c-utility_src}xlogging.o   
+        ${azure_sdk_c-utility_src}xlogging.o
+
+#SRCS_AZURE_SDK_PAL
+azure_iot_srcs_pal = \
+        ${azure_sdk_pal}tickcounter_t2.o ${azure_sdk_pal}threadapi_t2.o ${azure_sdk_pal}lock_t2.o ${azure_sdk_pal}agenttime_t2.o \
+        ${azure_sdk_pal}tlsio_t2.o ${azure_sdk_pal}platform_t2.o ${azure_sdk_pal}sntp.o ${azure_sdk_pal}certs.o ${azure_sdk_pal}t2_ntp.o
 
 #SRCS_IOTHUB_CLIENT
 azure_iot_srcs_iothub_client = \
@@ -168,12 +174,12 @@ azure_iot_srcs_serializer = \
         ${azure_sdk_serializer}jsonencoder.o ${azure_sdk_serializer}multitree.o \
         ${azure_sdk_serializer}methodreturn.o ${azure_sdk_serializer}schema.o \
         ${azure_sdk_serializer}schemalib.o \
-        ${azure_sdk_serializer}schemaserializer.o 
+        ${azure_sdk_serializer}schemaserializer.o
 
 #SRCS_UMQTT
 azure_iot_srcs_umqtt = \
         ${azure_sdk_umqtt}mqtt_client.o ${azure_sdk_umqtt}mqtt_codec.o \
-        ${azure_sdk_umqtt}mqtt_message.o 
+        ${azure_sdk_umqtt}mqtt_message.o
 
 
 #SRCS_PROVISIONING_CLIENT
@@ -186,30 +192,35 @@ azure_iot_srcs_provisioning_client = \
         ${azure_sdk_provisioning_client_src}prov_device_ll_client.o  \
         ${azure_sdk_provisioning_client_src}prov_transport_mqtt_client.o \
         ${azure_sdk_provisioning_client_src}prov_transport_mqtt_common.o \
-        ${azure_sdk_provisioning_client_adapters}hsm_client_data.o 
+        ${azure_sdk_provisioning_client_adapters}hsm_client_data.o
 
-$(objdir)/${lib_path}/libazure_iot_sdk_t2.a: $(addprefix $(objdir)/,${azure_iot_srcs_c_util}) \
+$(objdir)/${lib_azure_iot_sdk_path}/libazure_iot_sdk_t2.a: $(addprefix $(objdir)/,${azure_iot_srcs_c_util}) \
 	$(addprefix $(objdir)/,${azure_iot_srcs_iothub_client}) $(addprefix $(objdir)/,${azure_iot_srcs_serializer}) \
 	$(addprefix $(objdir)/,${azure_iot_srcs_umqtt}) $(addprefix $(objdir)/,${azure_iot_srcs_provisioning_client})
 
-	mkdir -p $(objdir)/${lib_path}
+	mkdir -p $(objdir)/${lib_azure_iot_sdk_path}
+	@ar rcs $@ $^
+
+$(objdir)/${lib_azure_iot_sdk_pal_path}/libazure_iot_sdk_t2_pal.a: $(addprefix $(objdir)/,${azure_iot_srcs_pal})
+
+	mkdir -p $(objdir)/${lib_azure_iot_sdk_pal_path}
 	@ar rcs $@ $^
 
 iothub_client_mqtt_sample-virt = yes
 iothub_client_mqtt_sample_obj  = ${azure_iothub_client_sample_mqtt}azure_main.o ${azure_iothub_client_sample_mqtt}iothub_client_sample_mqtt.o
-$(objdir)/iothub_client_mqtt_sample.elf:LIBS = -lcomponents -lazure_iot_sdk_t2 -lmbedtls -lwifi -llwip2 -limath -linnobase -ldragonfly
+$(objdir)/iothub_client_mqtt_sample.elf:LIBS = -lcomponents -lazure_iot_sdk_t2 -lazure_iot_sdk_t2_pal -lmbedtls -lwifi -llwip2 -limath -linnobase -ldragonfly
 $(objdir)/iothub_client_mqtt_sample.elf: $(addprefix $(objdir)/,${iothub_client_mqtt_sample_obj})
 
 iothub_devicetwin_and_methods_sample-virt = yes
 iothub_devicetwin_and_methods_sample_obj  = ${azure_iothub_devicetwin_and_methods_sample}azure_main.o \
                 ${azure_iothub_devicetwin_and_methods_sample}iothub_client_device_twin_and_methods_sample.o
-$(objdir)/iothub_devicetwin_and_methods_sample.elf:LIBS = -lcomponents -lazure_iot_sdk_t2 -lmbedtls -lwifi -llwip2 -limath -linnobase -ldragonfly
+$(objdir)/iothub_devicetwin_and_methods_sample.elf:LIBS = -lcomponents -lazure_iot_sdk_t2 -lazure_iot_sdk_t2_pal -lmbedtls -lwifi -llwip2 -limath -linnobase -ldragonfly
 $(objdir)/iothub_devicetwin_and_methods_sample.elf: $(addprefix $(objdir)/,${iothub_devicetwin_and_methods_sample_obj})
 
 prov_dev_client_ll_sample-virt = yes
 prov_dev_client_ll_sample_obj  = ${azure_iothub_prov_dev_client_ll_sample}azure_main.o ${azure_iothub_prov_dev_client_ll_sample}custom_hsm.o \
                 ${azure_iothub_prov_dev_client_ll_sample}certs/certs.o ${azure_iothub_prov_dev_client_ll_sample}prov_dev_client_ll_sample.o
-$(objdir)/prov_dev_client_ll_sample.elf:LIBS = -lcomponents -lazure_iot_sdk_t2 -lmbedtls -lwifi -llwip2 -limath -linnobase -ldragonfly
+$(objdir)/prov_dev_client_ll_sample.elf:LIBS = -lcomponents -lazure_iot_sdk_t2 -lazure_iot_sdk_t2_pal -lmbedtls -lwifi -llwip2 -limath -linnobase -ldragonfly
 $(objdir)/prov_dev_client_ll_sample.elf: $(addprefix $(objdir)/,${prov_dev_client_ll_sample_obj})
 
 clean:
