@@ -22,14 +22,7 @@
 #include "string.h"
 #include "errno.h"
 #include <wifi/wcm.h>
-
-#define INPUT_PARAMETER_SSID "ssid"
-#define INPUT_PARAMETER_PASSPHRASE "passphrase"
-
-// read the boot args
-const char *ssid;
-const char *passphrase;
-const char *hwaddr;
+#include "wifi_utils.h"
 
 static struct wcm_handle *h = NULL;
 static bool ap_link_up = false;
@@ -94,45 +87,53 @@ static void wcm_notify_callback(void *ctx, struct os_msg *msg)
 
 /**
  * Calls WCM APIs to asynchronously connect to a WiFi network.
- * @param ssid Pointer to string with the SSID of the desired network.
- * @param passphrase The passphrase of the desired network.
  *
  * @return Returns zero on success, negative error code from 
  * errorno.h in case of an error.
  */
-int wifi_main(const char *ssid, const char *pw)
+int wifi_main()
 {
-    int status;
-    os_printf("\n\rWiFi Details  SSID: %s, PASSWORD: %s\n\r", ssid, pw);
+    int rval;
+    struct network_profile *profile;
+    const char *np_conf_path = os_get_boot_arg_str("np_conf_path")?: NULL;
 
     h = wcm_create(NULL);
     if( h == NULL ){
         os_printf(" wcm_notify_enable failed.\n");
         return -ENOMEM;
     }
-    os_msleep(2000);
+    os_sleep_us(2000000, OS_TIMEOUT_NO_WAKEUP);
 
     wcm_notify_enable(h, wcm_notify_callback, NULL);
 
-    /* async connect to a WiFi network */
-    os_printf("Connecting to WiFi...\n");
-    status = wcm_add_network(h, ssid, NULL, pw);
-    os_printf("add network status: %d\n", status);
-    if(status != 0){
-        os_printf("adding network Failed\n");
-        /* can fail due to, already busy, no memory, or badly formatted password */
-        return status;
+    /* Connect to network */
+    if (np_conf_path != NULL) {
+        /* Create a Network Profile from a configuration file in
+         *the file system*/
+        rval = network_profile_new_from_file_system(&profile, np_conf_path);
+    } else {
+        /* Create a Network Profile using BOOT ARGS*/
+        rval = network_profile_new_from_boot_args(&profile);
+    }
+    if (rval < 0) {
+        pr_err("could not create network profile %d\n", rval);
+        return rval;
     }
 
-    os_printf("added network successfully, will try connecting..\n");
-    status = wcm_auto_connect(h, 1);
-    os_printf("connecting to network status: %d\n", status);
-    if(status != 0){
-        os_printf("trying to connect to network Failed\n");
-        /* can fail due to, already busy, no memory */
-        return status;
+    rval = wcm_add_network_profile(h, profile);
+    if (rval <  0) {
+        pr_err("could not associate network profile to wcm %d\n", rval);
+        return rval;
     }
-    return status;
+
+    os_printf("added network profile successfully, will try connecting..\n");
+    rval = wcm_auto_connect(h, true);
+    if(rval < 0) {
+        pr_err("network connection trial Failed, wcm_auto_connect returned %d\n", rval);
+        /* can fail due to, already busy, no memory */
+        return rval;
+    }
+    return rval;
 }
 
 /**
@@ -141,56 +142,58 @@ int wifi_main(const char *ssid, const char *pw)
  */
 void wifi_destroy(bool state_connected)
 {
-    int status;
+    int rval;
     if(state_connected){
-        status = wcm_auto_connect(h, 0);
-        if(status != 0){
-            os_printf("trying to disconnect to network Failed\n");
+        rval = wcm_auto_connect(h, 0);
+        if(rval != 0){
+            os_printf("trying to disconnect to network failed with %d\n", rval);
+        }
+
+        rval = wcm_delete_network_profile(h, NULL);
+        if(rval != 0){
+            os_printf("trying to remove network profile failed with %d\n", rval);
         }
     }
     wcm_destroy(h);
 }
 
 int main() {
-	int rc;
-	rc = init_platform();
-	if (rc) {
-		os_printf("init platform failed. ret:%d\n", rc);
-		return rc;
-	}
-
-	/* Enable device suspend (deep sleep) via boot argument */
-	if (os_get_boot_arg_int("suspend", 0) != 0)
-		os_suspend_enable();
-
-    while(!ap_got_ip) {
-    os_msleep(1000);
+    int rc;
+    rc = init_platform();
+    if (rc) {
+        os_printf("init platform failed. ret:%d\n", rc);
+        return rc;
     }
 
-	/* creates a thread */
-	azure_task = os_create_thread("azure_task", azure_task_fun, NULL, AZURE_TASK_PRIO, AZURE_TASK_STACK_SIZE);
-	 
-	if( azure_task == NULL )
-	{
-		os_printf(" thread creation failed\n");
-		return -1;
-	}
-	 
-	/* waits for thread function to finish */
-	os_join_thread(azure_task);
+    /* Enable device suspend (deep sleep) via boot argument */
+    if (os_get_boot_arg_int("suspend", 0) != 0)
+        os_suspend_enable();
 
-	while (true) {
-		os_msleep(1000);
-	}
-	return 0;
+    while(!ap_got_ip) {
+        os_sleep_us(1000000, OS_TIMEOUT_NO_WAKEUP);
+    }
+
+    /* creates a thread */
+    azure_task = os_create_thread("azure_task", azure_task_fun, NULL, AZURE_TASK_PRIO, AZURE_TASK_STACK_SIZE);
+	 
+    if( azure_task == NULL )
+    {
+        os_printf(" thread creation failed\n");
+        return -1;
+    }
+	 
+    /* waits for thread function to finish */
+    os_join_thread(azure_task);
+
+    while (true) {
+        os_sleep_us(1000000, OS_TIMEOUT_NO_WAKEUP);
+    }
+    return 0;
 }
 
 static int init_platform() {
-
     int ret;
-    ssid = os_get_boot_arg_str(INPUT_PARAMETER_SSID);
-    passphrase = os_get_boot_arg_str(INPUT_PARAMETER_PASSPHRASE);
-	ret = wifi_main(ssid,passphrase);
+    ret = wifi_main();
     if(ret != 0) {
         os_printf("main -- WiFi Connection Failed due to WCM returning error \n");
         wifi_destroy(0);

@@ -86,5 +86,5 @@ void ThreadAPI_Exit(int res)
 void ThreadAPI_Sleep(unsigned int milliseconds)
 {
     /*Codes_SRS_THREADAPI_30_001: [ ThreadAPI_Sleep shall suspend the thread for at least the supplied value of milliseconds. ]*/
-    os_msleep(milliseconds);
+    os_sleep_us(milliseconds * 1000, OS_TIMEOUT_NO_WAKEUP);
 }
