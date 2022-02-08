@@ -138,9 +138,9 @@ void iothub_client_sample_mqtt_run(void)
 
     g_continueRunning = true;
     srand((unsigned int)time(NULL));
-    int avgWindSpeed = 10;
-    int minTemperature = 20;
-    int minHumidity = 60;
+    double avgWindSpeed = 10.0;
+    double minTemperature = 20.0;
+    double minHumidity = 60.0;
 
     callbackCounter = 0;
     int receiveContext = 0;
@@ -178,8 +178,8 @@ void iothub_client_sample_mqtt_run(void)
 
                 /* Now that we are ready to receive commands, let's send some messages */
                 int iterator = 0;
-                int temperature = 0;
-                int humidity = 0;
+                double temperature = 0;
+                double humidity = 0;
                 time_t sent_time = 0;
                 time_t current_time = 0;
                 do
@@ -192,7 +192,7 @@ void iothub_client_sample_mqtt_run(void)
                     {
                         temperature = minTemperature + (rand() % 10);
                         humidity = minHumidity +  (rand() % 20);
-                        sprintf_s(msgText, sizeof(msgText), "{\"deviceId\":\"myFirstDevice\",\"windSpeed\":%d,\"temperature\":%d,\"humidity\":%d}", avgWindSpeed + (rand() % 4 + 2), temperature, humidity);
+                        sprintf_s(msgText, sizeof(msgText), "{\"deviceId\":\"myFirstDevice\",\"windSpeed\":%.2f,\"temperature\":%.2f,\"humidity\":%.2f}", avgWindSpeed + (rand() % 4 + 2), temperature, humidity);
                         if ((message.messageHandle = IoTHubMessage_CreateFromByteArray((const unsigned char*)msgText, strlen(msgText))) == NULL)
                         {
                             os_printf("ERROR: iotHubMessageHandle is NULL!\r\n");

@@ -66,8 +66,8 @@ typedef struct MAKER_TAG
 
 typedef struct GEO_TAG
 {
-    int longitude;
-    int latitude;
+    double longitude;
+    double latitude;
 } Geo;
 
 typedef struct CAR_STATE_TAG
@@ -269,7 +269,8 @@ static void deviceTwinCallback(DEVICE_TWIN_UPDATE_STATE update_state, const unsi
         {
             if (newCar->settings.location.latitude != oldCar->settings.location.latitude)
             {
-                os_printf("\n Received a new latitude = %d\n", newCar->settings.location.latitude);
+                os_printf("\n Received a new latitude = %f\n", newCar->settings.location.latitude);
+
                 oldCar->settings.location.latitude = newCar->settings.location.latitude;
             }
         }
@@ -278,7 +279,7 @@ static void deviceTwinCallback(DEVICE_TWIN_UPDATE_STATE update_state, const unsi
         {
             if (newCar->settings.location.longitude != oldCar->settings.location.longitude)
             {
-                os_printf("\n Received a new longitude = %d\n", newCar->settings.location.longitude);
+                os_printf("\n Received a new longitude = %f\n", newCar->settings.location.longitude);
                 oldCar->settings.location.longitude = newCar->settings.location.longitude;
             }
         }
