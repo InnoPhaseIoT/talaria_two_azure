@@ -23,6 +23,7 @@
 #include "errno.h"
 #include <wifi/wcm.h>
 #include "wifi_utils.h"
+#include "fs_utils.h"
 
 static struct wcm_handle *h = NULL;
 static bool ap_link_up = false;
@@ -193,6 +194,10 @@ int main() {
 
 static int init_platform() {
     int ret;
+
+	os_printf("Mounting file system\n");
+	ret = utils_mount_rootfs();
+
     ret = wifi_main();
     if(ret != 0) {
         os_printf("main -- WiFi Connection Failed due to WCM returning error \n");
