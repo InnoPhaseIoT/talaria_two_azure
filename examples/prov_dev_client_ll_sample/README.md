@@ -134,7 +134,7 @@ DISCONNECT
 
 Creating IoTHub Device handle
 
-Sending 1 messages to IoTHub every 2 seconds for 2 messages (Send any message to stop)
+Sending 1 message to IoTHub every 2 seconds for 2 messages (Send any message to stop)
 .
 .
 CONNECT
@@ -342,7 +342,7 @@ DISCONNECT
 
 Creating IoTHub Device handle
 
-Sending 1 messages to IoTHub every 2 seconds for 2 messages (Send any message to stop)
+Sending 1 message to IoTHub every 2 seconds for 2 messages (Send any message to stop)
 .
 .
 CONNECT

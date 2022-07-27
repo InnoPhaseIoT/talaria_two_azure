@@ -146,7 +146,7 @@ Now run any of the sample applications on Talaria TWO to see the events monitore
 
 <a name="releases"></a>
 
-New features and bug fixes are offered by both the SDKs (Talaria TWO SDK and Azure IoT SDC C).
+New features and bug fixes will be offered by both the SDKs (Talaria TWO SDK and Azure IoT SDC C).
 
 When a new SDK for Talaria TWO is released, a release from this Repo will be made to support that.
 
@@ -156,7 +156,7 @@ Releases made from this Repo will be 'tagged-releases' and each release-tag will
 
 ### For Example
 
-Tag "v1.0.0_TalariaTWO_SDK_2.3" has the folloing description --
+Tag "v1.0.0_TalariaTWO_SDK_2.3" has the following description --
 ```
 builds with - 'Talaria TWO SDK 2.3'
 
@@ -164,7 +164,7 @@ based on - azure-iot-sdk-c - LTS_07_2020_Ref02
 ```
 and
 
-Tag "v1.1.0_TalariaTWO_SDK_2.4" has the folloing description --
+Tag "v1.1.0_TalariaTWO_SDK_2.4" has the following description --
 ```
 builds with - 'Talaria TWO SDK 2.4'
 
@@ -176,7 +176,7 @@ Supported Talaria TWO SDK version is added with a `_TalariaTWO_SDK_m.n.o` to `vx
 
 A port to a newer LTS version from Azure IoT SDC C will bump the major version `x` and reset the minor version `y` and patch version `z` to 0.
 
-A new TalariaTWO SDK Release support will bump the minor version `y` and reset the patch version `z` to 0, while the majot version `x` remains the same.
+A new TalariaTWO SDK Release support will bump the minor version `y` and reset the patch version `z` to 0, while the major version `x` remains the same.
 
 A critical bug fix will bump the patch version `z` only.
 
