@@ -1,4 +1,4 @@
-# Azure IoT SDK C on InnoPhase Talaria TWO Platform
+# Azure IoT SDK C on InnoPhase IoT Talaria TWO Platform
 
 ## Table of Contents
 
@@ -14,7 +14,7 @@
 
 [Azure IoT SDK C](https://github.com/Azure/azure-iot-sdk-c) is ported on Talaria TWO Software Development Kit as per the porting guidelines provided by Azure IoT SDK C.
 
-Using this, the users can now start developing exciting [ultra-low power IoT solutions on Talaria TWO family of devices](https://innophaseinc.com/talaria-technology-details/), utilizing the power of the Azure IoT hub and services.
+Using this, the users can now start developing exciting [ultra-low power IoT solutions on Talaria TWO family of devices](https://innophaseiot.com/talaria-technology-details/), utilizing the power of the Azure IoT hub and services.
 
 Sample Application codes covering D2C, C2D, DeviceTwin, Direct Methods and Device Provisioning Services are provided.
 
@@ -26,7 +26,7 @@ Sample Application codes covering D2C, C2D, DeviceTwin, Direct Methods and Devic
 
 For evaluation and development, the Talaria TWO INP301x Development Kits can be used.
 
-The kits use InnoPhase’s award-winning Talaria TWO Multi-Protocol Platform with ultra-low power Wi-Fi + BLE5 for wireless data transfer, an embedded Arm Cortex-M3 for system control and user 
+The kits use InnoPhase IoT’s award-winning Talaria TWO Multi-Protocol Platform with ultra-low power Wi-Fi + BLE5 for wireless data transfer, an embedded Arm Cortex-M3 for system control and user 
 applications and advanced security features for device safeguards. These eval boards contain INP101x modules based on Talaria TWO INP2045 SoC.
 The kits include an Arduino UNO format baseboard with a Talaria TWO module attached and a different antenna option per kit. 
 
@@ -38,11 +38,11 @@ products such as smart locks, smart sensors, or security and health monitoring d
 
 A PC with Talaria TWO SDK development environment setup will be required to start tinkering and creating solutions.
 
-A User Guide for setting up Talaria TWO EVB-A can be found in this link : [User-Guide-for-Talaria-TWO-EVB-A-Evaluation-Board](https://innophaseinc.com/wp-content/uploads/modules/User-Guide-for-Talaria-TWO-EVB-A-Evaluation-Board.pdf).
+A User Guide for setting up Talaria TWO EVB-A can be found in this link : [User-Guide-for-Talaria-TWO-EVB-A-Evaluation-Board](https://innophaseiot.com/wp-content/uploads/modules/User-Guide-for-Talaria-TWO-EVB-A-Evaluation-Board.pdf).
 This has all the details needed for a successful setup, including description of components, power supply requirements, details of jumpers and the driver needed etc.
 
 
-For More details about Talaria TWO family of devices, please visit links [INP101x Modules and INP301x Dev-Kits](https://innophaseinc.com/talaria-two-modules/), [INP2045 SoC](https://innophaseinc.com/talaria-two/) and [additional documentation](https://innophaseinc.com/talaria-two-modules/#doc).
+For More details about Talaria TWO family of devices, please visit links [INP101x Modules and INP301x Dev-Kits](https://innophaseiot.com/talaria-two-modules/), [INP2045 SoC](https://innophaseiot.com/talaria-two/) and [additional documentation](https://innophaseiot.com/talaria-two-modules/#doc).
 
 The INP301x Dev Kits can be procured from [Mouser](https://www.mouser.com/manufacturer/innophase/) and [RichardsonRFPD](https://www.richardsonrfpd.com/Products/Search?searchBox=innophase&instockonly=false).
 
@@ -54,15 +54,15 @@ Alternatively, Talaria TWO SDK also supports the development using an Eclipse ba
 
 Talaria TWO SDK comes with above mentioned User Guides, an SDK API reference manual: 'Talaria TWO SDK API Reference Guide.pdf', various example applications, application notes and many reference applications and solution-ready applications with documents for the user to start the development targeting different use-cases.
 
-Talaria TWO SDK is available through InnoPhase Customer Portal Access and is available after portal registration, Mutual Non-Disclosure Agreement (MNDA) and Development Tools License Agreement (DTLA).
-For detailed information on registering and getting the SDK access along with the dev-environment setup documents, please follow this [customer portal link](https://innophaseinc.com/portal/customer-registration/).
+Talaria TWO SDK is available through InnoPhase IoT Customer Portal Access and is available after portal registration, Mutual Non-Disclosure Agreement (MNDA) and Development Tools License Agreement (DTLA).
+For detailed information on registering and getting the SDK access along with the dev-environment setup documents, please follow this [customer portal link](https://innophaseiot.com/portal/customer-registration/).
 
 ### Compiling the Sample Apps
 After setting up the development environments following the above mentioned links and documents, please follow the steps below to get started with Azure IoT SDK C Sample Apps:
 - Create a new folder in any place and clone the 'talaria_two_azure' repo using below command.
 
 ``` bash
-$ git clone --recursive https://github.com/InnoPhaseInc/talaria_two_azure.git
+$ git clone --recursive https://github.com/InnoPhaseIoT/talaria_two_azure.git
 ```
 
 This repo uses [Git Submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules) for it's dependencies. The option '--recursive' is required to clone the various git submodule repos (and their own eventual submodule dependencies) needed by 'talaria_two_azure' repo.
@@ -90,9 +90,9 @@ How to use Make to build binaries for different sample applications, is explaine
 ### Programming the Dev-Kits
 'Talaria TWO Download Tool' is used for programming the EVB-A and using the Debug Console.
 This tool is available for Windows and Linux platforms.
-User Guide for this tool is available here: [Talaria-TWO-Download-Tool-User-Guide](https://innophaseinc.com/wp-content/uploads/modules/Talaria-TWO-Download-Tool-User-Guide.pdf).
+User Guide for this tool is available here: [Talaria-TWO-Download-Tool-User-Guide](https://innophaseiot.com/wp-content/uploads/modules/Talaria-TWO-Download-Tool-User-Guide.pdf).
 
-The download tool can be [downloaded from this link](https://innophaseinc.com/talaria-two-modules#eval-software).
+The download tool can be [downloaded from this link](https://innophaseiot.com/talaria-two-modules#eval-software).
 
 The Download Tool is found in the following folder in the Evaluation Software downloaded from  above link: 
 : I-CUBE-T2-STW.zip\STM32CubeExpansion_T2-HostAPI-lib_V1.0\Utilities\PC_Software\TalariaTwo_DownloadTool\Tool_GUI
@@ -179,5 +179,3 @@ A port to a newer LTS version from Azure IoT SDC C will bump the major version `
 A new TalariaTWO SDK Release support will bump the minor version `y` and reset the patch version `z` to 0, while the major version `x` remains the same.
 
 A critical bug fix will bump the patch version `z` only.
-
-
