@@ -1,0 +1,72 @@
+From ad8fb49b41964683738b8271638f37d2a4f5fc43 Mon Sep 17 00:00:00 2001
+From: Tushar Kanani <tkanani@innophaseiot.com>
+Date: Tue, 28 Nov 2023 14:36:58 +0530
+Subject: [PATCH] Porting to FreeRtos
+
+---
+ parson.c | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
+
+diff --git a/parson.c b/parson.c
+index 95d97ea..2b90c88 100644
+--- a/parson.c
++++ b/parson.c
+@@ -37,6 +37,9 @@
+ #include <math.h>
+ #include <errno.h>
+ 
++#include <kernel/os.h>
++#include <osal.h>
++
+ /* Apparently sscanf is not implemented in some "standard" libraries, so don't use it, if you
+  * don't have to. */
+ #define sscanf THINK_TWICE_ABOUT_USING_SSCANF
+@@ -61,6 +64,10 @@
+ #define IS_NUMBER_INVALID(x) (((x) * 0.0) != 0.0)
+ #endif
+ 
++//using T2's libc's equivalent functions
++#define free osal_free
++#define malloc osal_alloc
++
+ static JSON_Malloc_Function parson_malloc = malloc;
+ static JSON_Free_Function parson_free = free;
+ 
+@@ -156,7 +163,8 @@ static char * parson_strndup(const char *string, size_t n) {
+         return NULL;
+     }
+     output_string[n] = '\0';
+-    strncpy(output_string, string, n);
++    //strncpy(output_string, string, n);
++    memcpy(output_string, string, n);
+     return output_string;
+ }
+ 
+@@ -993,7 +1001,10 @@ static int json_serialize_to_buffer_r(const JSON_Value *value, char *buf, int le
+             if (buf != NULL) {
+                 num_buf = buf;
+             }
+-            written = sprintf(num_buf, FLOAT_FORMAT, num);
++            //written = sprintf(num_buf, FLOAT_FORMAT, num);
++            //T2 sprintf() can take only array as first argument, so, use snprintf() instead.
++            written = snprintf(num_buf, NUM_BUF_SIZE, FLOAT_FORMAT, num);
++
+             if (written < 0) {
+                 return -1;
+             }
+@@ -1092,7 +1103,11 @@ static int append_string(char *buf, const char *string) {
+     if (buf == NULL) {
+         return (int)strlen(string);
+     }
+-    return sprintf(buf, "%s", string);
++    //return sprintf(buf, "%s", string);
++    //T2 sprintf() can take only array as first argument, so, use snprintf() instead.
++    int i;
++    i = (int)strlen(string);
++    return snprintf(buf, i+1, "%s", string);
+ }
+ 
+ #undef APPEND_STRING
+-- 
+2.25.1
+
