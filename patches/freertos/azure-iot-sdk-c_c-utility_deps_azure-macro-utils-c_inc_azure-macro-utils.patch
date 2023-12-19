@@ -1,0 +1,39 @@
+From 25193c20ac78622588bfeb423d3f7e684a5fec98 Mon Sep 17 00:00:00 2001
+From: Tushar Kanani <tkanani@innophaseiot.com>
+Date: Mon, 4 Dec 2023 15:57:09 +0530
+Subject: [PATCH] Minor changes
+
+---
+ inc/azure_macro_utils/macro_utils.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/inc/azure_macro_utils/macro_utils.h b/inc/azure_macro_utils/macro_utils.h
+index 2a91533..644c4f4 100644
+--- a/inc/azure_macro_utils/macro_utils.h
++++ b/inc/azure_macro_utils/macro_utils.h
+@@ -6,6 +6,9 @@
+ 
+ #include "azure_macro_utils/macro_utils_generated.h"
+ 
++#include "FreeRTOS.h"
++#include "osal.h"
++
+ #ifdef __cplusplus
+ #include <cstring>
+ #include <cstddef>
+@@ -21,6 +24,12 @@ extern "C" {
+     #define MU_FAILURE __LINE__
+ #endif
+ 
++//using T2's libc's equivalent functions
++#define free(_ptr)              osal_free((_ptr))
++#define malloc(_size)           osal_alloc((_size))
++#define realloc(_nmemb, _size)  osal_realloc((_nmemb), (_size))
++#define calloc(_nmemb, _size)   osal_calloc((_nmemb), (_size))
++
+ /*"pointer or NULL" macro - because when printf-ing arguments NULL is not valid for %s (section 7.1.4 of C11 standard) */
+ #define MU_P_OR_NULL(p) (((p)!=NULL)?(p):"NULL")
+ #define MU_WP_OR_NULL(p) (((p)!=NULL)?(p):L"NULL")
+-- 
+2.25.1
+

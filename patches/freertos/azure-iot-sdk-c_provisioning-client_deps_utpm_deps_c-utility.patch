@@ -1,0 +1,51 @@
+From 26df1e42e0b4fd032784f3abe89987e98e0e9cbe Mon Sep 17 00:00:00 2001
+From: Tushar Kanani <tkanani@innophaseiot.com>
+Date: Tue, 28 Nov 2023 14:44:12 +0530
+Subject: [PATCH] porting to freertos
+
+---
+ src/http_proxy_io.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/src/http_proxy_io.c b/src/http_proxy_io.c
+index 1e682dd5..a5ef538f 100644
+--- a/src/http_proxy_io.c
++++ b/src/http_proxy_io.c
+@@ -327,7 +327,9 @@ static void on_underlying_io_open_complete(void* context, IO_OPEN_RESULT open_re
+                             /* Codes_SRS_HTTP_PROXY_IO_01_091: [ To receive authorization, the client sends the userid and password, separated by a single colon (":") character, within a base64 [7] encoded string in the credentials. ]*/
+                             /* Codes_SRS_HTTP_PROXY_IO_01_092: [ A client MAY preemptively send the corresponding Authorization header with requests for resources in that space without receipt of another challenge from the server. ]*/
+                             /* Codes_SRS_HTTP_PROXY_IO_01_093: [ Userids might be case sensitive. ]*/
+-                            if (sprintf(plain_auth_string_bytes, "%s:%s", http_proxy_io_instance->username, (http_proxy_io_instance->password == NULL) ? "" : http_proxy_io_instance->password) < 0)
++                            //if (sprintf(plain_auth_string_bytes, "%s:%s", http_proxy_io_instance->username, (http_proxy_io_instance->password == NULL) ? "" : http_proxy_io_instance->password) < 0)
++                            //T2 sprintf() can take only array as first argument, so, use snprintf() instead.
++                            if (snprintf(plain_auth_string_bytes, plain_auth_string_length + 1, "%s:%s", http_proxy_io_instance->username, (http_proxy_io_instance->password == NULL) ? "" : http_proxy_io_instance->password) < 0)
+                             {
+                                 /* Codes_SRS_HTTP_PROXY_IO_01_062: [ If any failure is encountered while constructing the request, the on_open_complete callback shall be triggered with IO_OPEN_ERROR, passing also the on_open_complete_context argument as context. ]*/
+                                 encoded_auth_string = NULL;
+@@ -401,6 +403,7 @@ static void on_underlying_io_open_complete(void* context, IO_OPEN_RESULT open_re
+                         else
+                         {
+                             /* Codes_SRS_HTTP_PROXY_IO_01_059: [ - If username and password have been specified in the arguments passed to http_proxy_io_create, then the header Proxy-Authorization shall be added to the request. ]*/
++                            /*
+                             connect_request_length = sprintf(connect_request, request_format,
+                                 http_proxy_io_instance->hostname,
+                                 http_proxy_io_instance->port,
+@@ -408,6 +411,15 @@ static void on_underlying_io_open_complete(void* context, IO_OPEN_RESULT open_re
+                                 http_proxy_io_instance->port,
+                                 (http_proxy_io_instance->username != NULL) ? proxy_basic : "",
+                                 auth_string_payload);
++                            */
++                            //T2 sprintf() can take only array as first argument, so, use snprintf() instead.
++                            connect_request_length = snprintf(connect_request, connect_request_length + 1, request_format,
++                                http_proxy_io_instance->hostname,
++                                http_proxy_io_instance->port,
++                                http_proxy_io_instance->hostname,
++                                http_proxy_io_instance->port,
++                                (http_proxy_io_instance->username != NULL) ? proxy_basic : "",
++                                auth_string_payload);
+ 
+                             if (connect_request_length < 0)
+                             {
+-- 
+2.25.1
+

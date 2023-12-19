@@ -1,0 +1,204 @@
+From 2b30d45a092fa932c04dd68f0fdfaa210eca59c4 Mon Sep 17 00:00:00 2001
+From: Tushar Kanani <tkanani@innophaseiot.com>
+Date: Tue, 28 Nov 2023 14:23:26 +0530
+Subject: [PATCH] Porting to Freertos
+
+---
+ iothub_client/src/iothub_client_diagnostic.c  |  8 ++++++--
+ .../samples/custom_hsm_example/CMakeLists.txt |  4 ++--
+ provisioning_client/src/iothub_auth_client.c  |  4 +++-
+ provisioning_client/src/prov_auth_client.c    |  4 +++-
+ .../src/prov_device_ll_client.c               |  4 +++-
+ .../src/prov_transport_http_client.c          |  8 ++++++--
+ .../src/prov_transport_mqtt_common.c          | 20 ++++++++++++++++---
+ serializer/src/agenttypesystem.c              |  3 ++-
+ 8 files changed, 42 insertions(+), 13 deletions(-)
+
+diff --git a/iothub_client/src/iothub_client_diagnostic.c b/iothub_client/src/iothub_client_diagnostic.c
+index 788181486..e4b1c7d19 100644
+--- a/iothub_client/src/iothub_client_diagnostic.c
++++ b/iothub_client/src/iothub_client_diagnostic.c
+@@ -31,7 +31,9 @@ static char* get_epoch_time(char* timeBuffer)
+     }
+     else if (timeLen == sizeof(int64_t))
+     {
+-        if (sprintf(timeBuffer, "%"PRIu64, (int64_t)epochTime) < 0)
++        //if (sprintf(timeBuffer, "%"PRIu64, (int64_t)epochTime) < 0)
++        //T2 sprintf() can take only array as first argument, so, use snprintf() instead.
++        if (snprintf(timeBuffer, TIME_STRING_BUFFER_LEN, "%"PRIu64, (int64_t)epochTime) < 0)
+         {
+             LogError("Failed sprintf to timeBuffer with 8 bytes of time_t");
+             result = NULL;
+@@ -43,7 +45,9 @@ static char* get_epoch_time(char* timeBuffer)
+     }
+     else if (timeLen == sizeof(int32_t))
+     {
+-        if (sprintf(timeBuffer, "%"PRIu32, (int32_t)epochTime) < 0)
++        //if (sprintf(timeBuffer, "%"PRIu32, (int32_t)epochTime) < 0)
++        //T2 sprintf() can take only array as first argument, so, use snprintf() instead.
++        if (snprintf(timeBuffer, TIME_STRING_BUFFER_LEN, "%"PRIu32, (int32_t)epochTime) < 0)
+         {
+             LogError("Failed sprintf to timeBuffer with 4 bytes of time_t");
+             result = NULL;
+diff --git a/provisioning_client/samples/custom_hsm_example/CMakeLists.txt b/provisioning_client/samples/custom_hsm_example/CMakeLists.txt
+index f49c0b93e..2fb9b7747 100644
+--- a/provisioning_client/samples/custom_hsm_example/CMakeLists.txt
++++ b/provisioning_client/samples/custom_hsm_example/CMakeLists.txt
+@@ -19,8 +19,8 @@ IF(WIN32)
+     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+ ELSE()
+     # Make warning as error
+-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -pedantic -Wno-variadic-macros -fPIC")
+-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror -pedantic -Wno-variadic-macros -fPIC")
++    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wno-variadic-macros -fPIC")
++    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror -Wno-variadic-macros -fPIC")
+ ENDIF(WIN32)
+ 
+ add_library(custom_hsm_example ${source_files})
+diff --git a/provisioning_client/src/iothub_auth_client.c b/provisioning_client/src/iothub_auth_client.c
+index 3d03c587d..8e685d8b6 100644
+--- a/provisioning_client/src/iothub_auth_client.c
++++ b/provisioning_client/src/iothub_auth_client.c
+@@ -327,7 +327,9 @@ CREDENTIAL_RESULT* iothub_device_auth_generate_credentials(IOTHUB_SECURITY_HANDL
+                     unsigned char* data_value;
+                     size_t data_len;
+ 
+-                    size_t total_len = sprintf(payload, "%s\n%s", dev_auth_cred->sas_info.token_scope, expire_token);
++                    //size_t total_len = sprintf(payload, "%s\n%s", dev_auth_cred->sas_info.token_scope, expire_token);
++                    //T2 sprintf() can take only array as first argument, so, use snprintf() instead.
++                    size_t total_len = snprintf(payload, len+1, "%s\n%s", dev_auth_cred->sas_info.token_scope, expire_token);
+                     if (total_len <= 0)
+                     {
+                         result = NULL;
+diff --git a/provisioning_client/src/prov_auth_client.c b/provisioning_client/src/prov_auth_client.c
+index fa1405e1c..f4b95819f 100644
+--- a/provisioning_client/src/prov_auth_client.c
++++ b/provisioning_client/src/prov_auth_client.c
+@@ -566,7 +566,9 @@ char* prov_auth_construct_sas_token(PROV_AUTH_HANDLE handle, const char* token_s
+         {
+             unsigned char* data_value;
+             size_t data_len;
+-            (void)sprintf(payload, "%s\n%s", token_scope, expire_token);
++            //(void)sprintf(payload, "%s\n%s", token_scope, expire_token);
++            //T2 sprintf() can take only array as first argument, so, use snprintf() instead.
++            (void)snprintf(payload, len + 1, "%s\n%s", token_scope, expire_token);
+ 
+             /* Codes_SRS_SECURE_ENCLAVE_CLIENT_07_031: [ prov_auth_get_certificate shall import the specified cert into the client using hsm_client_get_cert secure enclave function. ] */
+             if (sign_sas_data(handle, payload, &data_value, &data_len) == 0)
+diff --git a/provisioning_client/src/prov_device_ll_client.c b/provisioning_client/src/prov_device_ll_client.c
+index 26ffb69f7..861a47f4d 100644
+--- a/provisioning_client/src/prov_device_ll_client.c
++++ b/provisioning_client/src/prov_device_ll_client.c
+@@ -152,7 +152,9 @@ static char* prov_transport_challenge_callback(const unsigned char* nonce, size_
+                 LogError("Failure to allocate token scope");
+                 result = NULL;
+             }
+-            else if (sprintf(token_scope, SAS_TOKEN_SCOPE_FMT, prov_info->scope_id, prov_info->registration_id) <= 0)
++            //else if (sprintf(token_scope, SAS_TOKEN_SCOPE_FMT, prov_info->scope_id, prov_info->registration_id) <= 0)
++            //T2 sprintf() can take only array as first argument, so, use snprintf() instead.
++            else if (snprintf(token_scope, token_scope_len + 1, SAS_TOKEN_SCOPE_FMT, prov_info->scope_id, prov_info->registration_id) <= 0)
+             {
+                 LogError("Failure to constructing token_scope");
+                 free(token_scope);
+diff --git a/provisioning_client/src/prov_transport_http_client.c b/provisioning_client/src/prov_transport_http_client.c
+index 6355bf1d6..b5c0d9399 100644
+--- a/provisioning_client/src/prov_transport_http_client.c
++++ b/provisioning_client/src/prov_transport_http_client.c
+@@ -332,7 +332,9 @@ static char* construct_url_path(PROV_TRANSPORT_HTTP_INFO* http_info)
+             }
+             else
+             {
+-                if (sprintf(result, PROV_REGISTRATION_URI_FMT, STRING_c_str(encoded_scope), STRING_c_str(encoded_reg_id), http_info->api_version) == 0)
++                //if (sprintf(result, PROV_REGISTRATION_URI_FMT, STRING_c_str(encoded_scope), STRING_c_str(encoded_reg_id), http_info->api_version) == 0)
++                //T2 sprintf() can take only array as first argument, so, use snprintf() instead.
++                if (snprintf(result, path_len + 1, PROV_REGISTRATION_URI_FMT, STRING_c_str(encoded_scope), STRING_c_str(encoded_reg_id), http_info->api_version) == 0)
+                 {
+                     LogError("Failure constructing url path");
+                     free(result);
+@@ -357,7 +359,9 @@ static char* construct_url_path(PROV_TRANSPORT_HTTP_INFO* http_info)
+                 }
+                 else
+                 {
+-                    if (sprintf(result, PROV_OP_STATUS_URI_FMT, STRING_c_str(encoded_scope), STRING_c_str(encoded_reg_id), STRING_c_str(encoded_op_id), http_info->api_version) == 0)
++                    //if (sprintf(result, PROV_OP_STATUS_URI_FMT, STRING_c_str(encoded_scope), STRING_c_str(encoded_reg_id), STRING_c_str(encoded_op_id), http_info->api_version) == 0)
++                    //T2 sprintf() can take only array as first argument, so, use snprintf() instead.
++                    if (snprintf(result, path_len + 1, PROV_OP_STATUS_URI_FMT, STRING_c_str(encoded_scope), STRING_c_str(encoded_reg_id), STRING_c_str(encoded_op_id), http_info->api_version) == 0)
+                     {
+                         LogError("failure allocating retrieval path");
+                         free(result);
+diff --git a/provisioning_client/src/prov_transport_mqtt_common.c b/provisioning_client/src/prov_transport_mqtt_common.c
+index d03a4b80d..c36e09c5a 100644
+--- a/provisioning_client/src/prov_transport_mqtt_common.c
++++ b/provisioning_client/src/prov_transport_mqtt_common.c
+@@ -430,7 +430,9 @@ static int send_register_message(PROV_TRANSPORT_MQTT_INFO* mqtt_info)
+         LogError("Failed allocating mqtt registration message");
+         result = MU_FAILURE;
+     }
+-    else if (sprintf(msg_topic, MQTT_REGISTER_MESSAGE_FMT, mqtt_info->packet_id) <= 0)
++    //else if (sprintf(msg_topic, MQTT_REGISTER_MESSAGE_FMT, mqtt_info->packet_id) <= 0)
++    //T2 sprintf() can take only array as first argument, so, use snprintf() instead.
++    else if (snprintf(msg_topic, length + 1, MQTT_REGISTER_MESSAGE_FMT, mqtt_info->packet_id) <= 0)
+     {
+         LogError("Failed setting registration message");
+         free(msg_topic);
+@@ -455,7 +457,9 @@ static int send_operation_status_message(PROV_TRANSPORT_MQTT_INFO* mqtt_info)
+         LogError("Failed allocating mqtt status message");
+         result = MU_FAILURE;
+     }
+-    else if (sprintf(msg_topic, MQTT_STATUS_MESSAGE_FMT, mqtt_info->packet_id, mqtt_info->operation_id) <= 0)
++    //else if (sprintf(msg_topic, MQTT_STATUS_MESSAGE_FMT, mqtt_info->packet_id, mqtt_info->operation_id) <= 0)
++    //T2 sprintf() can take only array as first argument, so, use snprintf() instead.
++    else if (snprintf(msg_topic, length + 1, MQTT_STATUS_MESSAGE_FMT, mqtt_info->packet_id, mqtt_info->operation_id) <= 0)
+     {
+         LogError("Failed creating mqtt status message");
+         free(msg_topic);
+@@ -499,7 +503,9 @@ static char* construct_username(PROV_TRANSPORT_MQTT_INFO* mqtt_info)
+         LogError("Failure allocating username");
+         result = NULL;
+     }
+-    else if (sprintf(result, MQTT_USERNAME_FMT, mqtt_info->scope_id, mqtt_info->registration_id, mqtt_info->api_version, PROV_DEVICE_CLIENT_VERSION) <= 0)
++    //else if (sprintf(result, MQTT_USERNAME_FMT, mqtt_info->scope_id, mqtt_info->registration_id, mqtt_info->api_version, PROV_DEVICE_CLIENT_VERSION) <= 0)
++    //T2 sprintf() can take only array as first argument, so, use snprintf() instead.
++    else if (snprintf(result, length + 1, MQTT_USERNAME_FMT, mqtt_info->scope_id, mqtt_info->registration_id, mqtt_info->api_version, PROV_DEVICE_CLIENT_VERSION) <= 0)
+     {
+         LogError("Failure creating mqtt username");
+         free(result);
+@@ -632,6 +638,14 @@ static int create_connection(PROV_TRANSPORT_MQTT_INFO* mqtt_info)
+     {
+         (void)mqtt_client_set_trace(mqtt_info->mqtt_client, mqtt_info->log_trace, false);
+ 
++        #if 0
++        //enable this code to have mqtt transport layer TRACE debug mssgs, very useful at times.
++        (void)mqtt_client_set_trace(mqtt_info->mqtt_client, mqtt_info->log_trace, true);
++
++        //print username_info
++        os_printf("prov_transport_mqtt_common.c username_info is %s \n", username_info);
++        #endif
++
+         options.username = username_info;
+         options.clientId = mqtt_info->registration_id;
+         options.useCleanSession = 1;
+diff --git a/serializer/src/agenttypesystem.c b/serializer/src/agenttypesystem.c
+index 11fc3668d..0f7864ffe 100644
+--- a/serializer/src/agenttypesystem.c
++++ b/serializer/src/agenttypesystem.c
+@@ -17,6 +17,7 @@
+ #include <math.h>
+ #include <limits.h>
+ #include <errno.h>
++#include <stdlib.h>
+ 
+ /*if ULLONG_MAX is defined by limits.h for whatever reasons... */
+ #ifndef ULLONG_MAX
+@@ -3084,7 +3085,7 @@ static int sscanff(const char*src, float* dst)
+ {
+     int result = 1;
+     char* next;
+-    (*dst) = strtof(src, &next);
++    (*dst) = (float )strtod(src, &next);
+     if ((src == next) || (((*dst) == HUGE_VALF) && (errno != 0)))
+     {
+         result = EOF;
+-- 
+2.25.1
+
