@@ -9,7 +9,7 @@ More details about the attestation mechanism supported by Azure IoT Hub can be f
 
 ## Creating Device Provisioning Service Resource
 
-- Azure IoT Hub created in steps defined in the repo [README](../../README.md#creating-an-azure-iot-device) document can be used here.
+- Azure IoT Hub created in steps defined in the repo [README](../../../README.md#creating-an-azure-iot-device) document can be used here.
 - Let's assume, for the example and document's logs showcase purposes that the Azure IoT Hub we created is named `InnoAzureIoTHub`.
 - In the Azure portal, go for the option 'Create a resource'.
 - Search for "device provisioning" and select `IoT Hub Device Provisioning Service`.
@@ -81,7 +81,7 @@ Now, do a `make clean` and then run `make build_type=prov_build_with_symm_key` f
 
 ### Trying out the example
 
-Using Talaria TWO Download Tool, program the EVB-A with the example binary 'prov_dev_client_ll_sample.elf' giving the ssid and passphrase of your access point. No other boot arguments are needed to run this example. Details on how to use the Download Tool can be found in the repo [README](../../README.md#creating-an-azure-iot-device) document.
+Using Talaria TWO Download Tool, program the EVB-A with the example binary 'prov_dev_client_ll_sample.elf' giving the ssid and passphrase of your access point. No other boot arguments are needed to run this example. Details on how to use the Download Tool can be found in the repo [README](../../../README.md#creating-an-azure-iot-device) document.
 
 After running the provisioning application successfully, in the Talaria TWO Console you will notice the logs detailed below :
 - The device connects to the DPS server with the `ID Scope` and communicates with the enrollment entity named `Registration ID` we provided.
@@ -289,7 +289,7 @@ Now, do a `make clean` and then run `make build_type=prov_build_with_x509` for g
 
 ### Trying out the example
 
-Using Talaria TWO Download Tool, program the EVB-A with the example binary 'prov_dev_client_ll_sample.elf' giving the ssid and passphrase of your access point. No other boot arguments are needed to run this example. Details on how to use the Download Tool can be found in the repo [README](../../README.md#creating-an-azure-iot-device) document.
+Using Talaria TWO Download Tool, program the EVB-A with the example binary 'prov_dev_client_ll_sample.elf' giving the ssid and passphrase of your access point. No other boot arguments are needed to run this example. Details on how to use the Download Tool can be found in the repo [README](../../../README.md#creating-an-azure-iot-device) document.
 
 After running the provisioning application successfully, in the Talaria TWO Console you will notice the logs detailed below :
 - The device connects to the DPS server with the `ID Scope` and communicates with the enrollment entity named in `COMMON_NAME` of 'leaf.csr' we provided.
