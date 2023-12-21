@@ -4,7 +4,7 @@ This Sample Application demonstrates Device to Cloud (D2C) and Cloud to Device (
 
 
 ## Device Configuration
-- Azure IoT device created in steps defined in the repo [README](../../README.md#creating-an-azure-iot-device) document can be used here.
+- Azure IoT device created in steps defined in the repo [README](../../../README.md#creating-an-azure-iot-device) document can be used here.
 How to Make/build binaries for Talaria TWO Devices and how to install and use Azure CLI is also covered in this document already.
 
 We have already noted down the connection string for the device.
@@ -34,7 +34,7 @@ Do a `make clean` and run `make` for generating the binaries for `Azure IoT HUB 
 
 ## Trying out the example
 
-- Using Talaria TWO Download Tool, program the EVB-A with the example binary 'iothub_client_mqtt_sample.elf' giving the ssid and passphrase of your access point. No other boot arguments are needed to run this example. Details on how to use the Download Tool can be found in the repo [README](../../README.md#creating-an-azure-iot-device) document.
+- Using Talaria TWO Download Tool, program the EVB-A with the example binary 'iothub_client_mqtt_sample.elf' giving the ssid and passphrase of your access point. No other boot arguments are needed to run this example. Details on how to use the Download Tool can be found in the repo [README](../../../README.md#creating-an-azure-iot-device) document.
 
 
 - Azure CLI with IoT extension can be used for monitoring the events.

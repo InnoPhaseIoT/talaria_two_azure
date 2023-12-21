@@ -4,7 +4,7 @@ This Sample Application demonstrates Device Twin and Direct Methods functionalit
 
 
 ## Device Configuration
-- Azure IoT device created in steps defined in the repo [README](../../README.md#creating-an-azure-iot-device) document can be used here.
+- Azure IoT device created in steps defined in the repo [README](../../../README.md#creating-an-azure-iot-device) document can be used here.
 How to Make/build binaries for Talaria TWO Devices and how to install and use Azure CLI is also covered in this document already.
 
 We have already noted down the connection string for the device.
@@ -37,7 +37,7 @@ Do a `make clean` and run `make` for generating the binaries for `Device Twin an
 ## Trying out the example
 
 
-- Using Talaria TWO Download Tool, program the EVB-A with the example binary 'iothub_devicetwin_and_methods_sample.elf' giving the ssid and passphrase of your access point. No other boot arguments are needed to run this example. Details on how to use the Download Tool can be found in the repo [README](../../README.md#creating-an-azure-iot-device) document.
+- Using Talaria TWO Download Tool, program the EVB-A with the example binary 'iothub_devicetwin_and_methods_sample.elf' giving the ssid and passphrase of your access point. No other boot arguments are needed to run this example. Details on how to use the Download Tool can be found in the repo [README](../../../README.md#creating-an-azure-iot-device) document.
 
 
 After running the application, you can check updated properties by navigating to `Azure Portal` -> `your IoT Hub` -> `IoT devices` -> `your IoT device` -> `Device Twin`
@@ -77,7 +77,7 @@ Car: {
 
 ### Confirming the Update to Device Twin Reported Properties
 
-Azure IoT device created in steps defined in the repo [README](../../README.md#creating-an-azure-iot-device) document can be used here.
+Azure IoT device created in steps defined in the repo [README](../../../README.md#creating-an-azure-iot-device) document can be used here.
 
 Before running this Sample Application, navigate to `Azure Portal` -> `your IoT Hub` -> `IoT Devices` -> `your IoT device` -> `Device Twin` and you will notice a default TWIN JSON similar to as shown below -
 
