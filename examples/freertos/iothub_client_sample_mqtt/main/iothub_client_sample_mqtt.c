@@ -96,7 +96,7 @@ static IOTHUBMESSAGE_DISPOSITION_RESULT ReceiveMessageCallback(IOTHUB_MESSAGE_HA
             {
                 size_t index;
 
-                printf(" Message Properties:\r\n");
+                os_printf(" Message Properties:\r\n");
                 for (index = 0; index < propertyCount; index++)
                 {
                     os_printf("\tKey: %s Value: %s\r\n", keys[index], values[index]);
