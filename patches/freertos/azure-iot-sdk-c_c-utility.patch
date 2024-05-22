@@ -1,13 +1,14 @@
-From 8f2d16ca24d3c94008900eef70f18e347b5d92c0 Mon Sep 17 00:00:00 2001
+From ba298a6e2820bf8c97af2ad766bd5f25e65f598e Mon Sep 17 00:00:00 2001
 From: Tushar Kanani <tkanani@innophaseiot.com>
-Date: Mon, 4 Dec 2023 17:27:19 +0530
-Subject: [PATCH] porting to freertos
+Date: Mon, 22 Apr 2024 17:50:10 +0530
+Subject: [PATCH] azure-sdk-c patch
 
 ---
  adapters/linux_time.h                 |  2 +-
  inc/azure_c_shared_utility/xlogging.h | 17 +++++++++++++----
+ src/consolelogger.c                   |  8 ++++----
  src/http_proxy_io.c                   | 14 +++++++++++++-
- 3 files changed, 27 insertions(+), 6 deletions(-)
+ 4 files changed, 31 insertions(+), 10 deletions(-)
 
 diff --git a/adapters/linux_time.h b/adapters/linux_time.h
 index bdd91a73..df396da6 100644
@@ -73,6 +74,37 @@ index a38a9b5d..471ed93f 100644
  #endif
  
  #if defined _MSC_VER
+diff --git a/src/consolelogger.c b/src/consolelogger.c
+index ef7a1bc5..484d7c5e 100755
+--- a/src/consolelogger.c
++++ b/src/consolelogger.c
+@@ -209,22 +209,22 @@ void consolelogger_log(LOG_CATEGORY log_category, const char* file, const char*
+     switch (log_category)
+     {
+     case AZ_LOG_INFO:
+-        (void)printf("Info: ");
++        (void)os_printf("Info: ");
+         break;
+     case AZ_LOG_ERROR:
+-        (void)printf("Error: Time:%.24s File:%s Func:%s Line:%d ", ctime(&t), file, func, line);
++        (void)os_printf("Error: Time:%.24s File:%s Func:%s Line:%d ", ctime(&t), file, func, line);
+         break;
+     default:
+         break;
+     }
+ 
+-    (void)vprintf(format, args);
++    (void)os_vprintf(format, args);
+     va_end(args);
+ 
+     (void)log_category;
+     if (options & LOG_LINE)
+     {
+-        (void)printf("\r\n");
++        (void)os_printf("\r\n");
+     }
+ }
+ 
 diff --git a/src/http_proxy_io.c b/src/http_proxy_io.c
 index 1e682dd5..a5ef538f 100644
 --- a/src/http_proxy_io.c
