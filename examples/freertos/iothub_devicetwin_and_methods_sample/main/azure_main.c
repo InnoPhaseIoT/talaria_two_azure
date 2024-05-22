@@ -191,7 +191,7 @@ int main() {
     }
 	 
     /* waits for thread function to finish */
-    vTaskSuspend((void *)azure_task);
+    vTaskSuspend(NULL);
 
     while (true) {
         vTaskDelay(1000);
