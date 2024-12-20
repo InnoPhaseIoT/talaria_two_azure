@@ -1,10 +1,10 @@
 #!/bin/bash
-PLATFORM_TYPE=$(cat ../../build.mak | grep "INP_FREERTOS_SDK")
-if [ "$PLATFORM_TYPE" = "BUILD_TYPE_FLAG = -DINP_FREERTOS_SDK" ]
+PLATFORM_TYPE=$(cat ../../build.mak | grep "SDK_THREE_DOT_X")
+if [ "$PLATFORM_TYPE" = "BUILD_TYPE_FLAG = -DSDK_THREE_DOT_X" ]
 then
-    OS_TYPE=freertos
+    OS_TYPE=sdk_3.x
 else
-  OS_TYPE=inno_os
+  OS_TYPE=sdk_2.x
 fi
 
 
@@ -48,7 +48,7 @@ echo "...patching $ROOT_PATH/$PATCH_TARGET_4_PATH"
 cd $ROOT_PATH/$PATCH_TARGET_4_PATH
 git apply --whitespace=nowarn $ROOT_PATH/$PATCH_FILE_4_PATH
 
-if [ "$PLATFORM_TYPE" != "BUILD_TYPE_FLAG = -DINP_FREERTOS_SDK" ]
+if [ "$PLATFORM_TYPE" != "BUILD_TYPE_FLAG = -DSDK_THREE_DOT_X" ]
 then
     echo "...patching $ROOT_PATH/$PATCH_TARGET_5_PATH"
     cd $ROOT_PATH/$PATCH_TARGET_5_PATH

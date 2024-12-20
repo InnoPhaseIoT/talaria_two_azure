@@ -45,14 +45,14 @@ azure_sdk_provisioning_client_src=$(T2AZURE_LOC)/azure-iot-sdk-c/provisioning_cl
 azure_sdk_provisioning_client_adapters=$(T2AZURE_LOC)/azure-iot-sdk-c/provisioning_client/adapters/
 azure_sdk_provisioning_client_deps=$(T2AZURE_LOC)/azure-iot-sdk-c/provisioning_client/deps/utpm/deps/c-utility/src/
 
-azure_sdk_pal=$(T2AZURE_LOC)/pal/freertos/src/
+azure_sdk_pal=$(T2AZURE_LOC)/pal/sdk_3.x/src/
 
 commonIncs = \
         -I$(T2AZURE_LOC)/azure-iot-sdk-c/c-utility/inc \
         -I$(T2AZURE_LOC)/azure-iot-sdk-c/c-utility/pal/generic \
         -I$(T2AZURE_LOC)/azure-iot-sdk-c/c-utility/deps/azure-macro-utils-c/inc \
         -I$(T2AZURE_LOC)/azure-iot-sdk-c/c-utility/deps/umock-c/inc\
-        -I$(T2AZURE_LOC)/pal/freertos/inc
+        -I$(T2AZURE_LOC)/pal/sdk_3.x/inc
 
 iotclientIncs = \
         -I$(T2AZURE_LOC)/azure-iot-sdk-c/iothub_client/inc \
@@ -226,10 +226,10 @@ libazure_iot_sdk_t2_OBJS := \
 
 $(OUTDIR)/${lib_azure_iot_sdk_t2_path}/libazure_iot_sdk_t2.a: $(libazure_iot_sdk_t2_OBJS)
 $(OUTDIR)/${lib_azure_iot_sdk_t2_path}/libazure_iot_sdk_t2.a: lib_objs = $(libazure_iot_sdk_t2_OBJS)
- 
+
 libazure_iot_sdk_t2_pal_OBJS := \
         $(addprefix $(OUTDIR)/,${azure_iot_srcs_pal})
- 
+
 $(OUTDIR)/${lib_azure_iot_sdk_t2_pal_path}/libazure_iot_sdk_t2_pal.a: $(libazure_iot_sdk_t2_pal_OBJS)
 $(OUTDIR)/${lib_azure_iot_sdk_t2_pal_path}/libazure_iot_sdk_t2_pal.a: lib_objs = $(libazure_iot_sdk_t2_pal_OBJS)
 
@@ -237,9 +237,9 @@ $(OUTDIR)/${lib_azure_iot_sdk_t2_pal_path}/libazure_iot_sdk_t2_pal.a: lib_objs =
 
 # Reference -- add the application's code paths here 
 
-APP := iothub_devicetwin_and_methods_sample.elf
+APP := iothub_client_mqtt_sample.elf
 
-app_src=$(T2AZURE_LOC)/examples/freertos/iothub_devicetwin_and_methods_sample/main
+app_src=$(T2AZURE_LOC)/examples/sdk_3.x/iothub_client_sample_mqtt/main
 
 CFLAGS += -I${app_src}
 
@@ -248,13 +248,13 @@ LDFLAGS += -L$(OUTDIR)/${lib_azure_iot_sdk_t2_path}
 LDFLAGS += -L$(OUTDIR)/${lib_azure_iot_sdk_t2_pal_path}
 LDFLAGS += --no-gc-sections 
 
-# Devicetwin and methods sample app code
-IOTHUB_DEVICETWIN_AND_METHODS_SAMPLE_SRC_FILES +=  \
+# #mqtt client sample app code
+IOTHUB_CLIENT_MQTT_SAMPLE_SRC_FILES +=  \
         ${app_src}/azure_main.o \
-        ${app_src}/iothub_client_device_twin_and_methods_sample.o
+        ${app_src}/iothub_client_sample_mqtt.o
  
-IOTHUB_DEVICETWIN_AND_METHODS_SAMPLE_OBJ_FILES := $(addprefix $(OUTDIR), $(IOTHUB_DEVICETWIN_AND_METHODS_SAMPLE_SRC_FILES:%.c=%.o))
-$(OUTDIR)/$(APP)   :  $(IOTHUB_DEVICETWIN_AND_METHODS_SAMPLE_OBJ_FILES)
+IOTHUB_CLIENT_MQTT_SAMPLE_OBJ_FILES := $(addprefix $(OUTDIR), $(IOTHUB_CLIENT_MQTT_SAMPLE_SRC_FILES:%.c=%.o))
+$(OUTDIR)/$(APP)   :  $(IOTHUB_CLIENT_MQTT_SAMPLE_OBJ_FILES)
 
 ALL_APPS := $(APP)
 ALL_APPS := $(ALL_APPS) $(ALL_APPS:%.elf=%.elf.strip)

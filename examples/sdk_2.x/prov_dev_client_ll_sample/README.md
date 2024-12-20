@@ -47,7 +47,7 @@ More details with the screenshots about these steps can be found [here](https://
 
 ### Device Configuration
 
-For this method, we will need to populate `ID Scope`, `Registration ID` and `Symmetric Key` in the file `<sdk_path>/apps/talaria_two_azure/examples/inno_os/prov_dev_client_ll_sample/main/prov_dev_client_ll_sample.c`. 
+For this method, we will need to populate `ID Scope`, `Registration ID` and `Symmetric Key` in the file `<sdk_path>/apps/talaria_two_azure/examples/sdk_2.x/prov_dev_client_ll_sample/main/prov_dev_client_ll_sample.c`. 
 
 In this file search for the function `prov_dev_client_ll_sample_run()`. Here you will find the code :
 
@@ -65,7 +65,7 @@ to populate this, as shown below for example -
 
 Now, copy the ID Scope of the Device Provisioning Service we created. This can be found on the Azure portal under the "Overview" section of DPS.
 
-Then in the same file `<sdk_path>/apps/talaria_two_azure/examples/inno_os/prov_dev_client_ll_sample/main/prov_dev_client_ll_sample.c`, searching for `id_scope` you will find the code :
+Then in the same file `<sdk_path>/apps/talaria_two_azure/examples/sdk_2.x/prov_dev_client_ll_sample/main/prov_dev_client_ll_sample.c`, searching for `id_scope` you will find the code :
 
 ```
 static const char* id_scope = "XXXXXXXXXXX";
@@ -250,13 +250,13 @@ You will notice that an enrollment entity has been created with the same name we
 ### Device Configuration
 
 For this method, we will need to populate 
-- `ID Scope` in the file `<sdk_path>/apps/talaria_two_azure/examples/inno_os/prov_dev_client_ll_sample/main/prov_dev_client_ll_sample.c`
-- `COMMON_NAME` in the file `<sdk_path>/apps/talaria_two_azure/examples/inno_os/prov_dev_client_ll_sample/main/custom_hsm.c`
-- `leaf_cert_pem_start[]` and `leaf_pv_key_pem_start[]` in file `<sdk_path>/apps/talaria_two_azure/examples/inno_os/prov_dev_client_ll_sample/main/certs/certs.c`
+- `ID Scope` in the file `<sdk_path>/apps/talaria_two_azure/examples/sdk_2.x/prov_dev_client_ll_sample/main/prov_dev_client_ll_sample.c`
+- `COMMON_NAME` in the file `<sdk_path>/apps/talaria_two_azure/examples/sdk_2.x/prov_dev_client_ll_sample/main/custom_hsm.c`
+- `leaf_cert_pem_start[]` and `leaf_pv_key_pem_start[]` in file `<sdk_path>/apps/talaria_two_azure/examples/sdk_2.x/prov_dev_client_ll_sample/main/certs/certs.c`
 
 Copy the ID Scope of the Device Provisioning Service we created. This can be found on the Azure portal under the "Overview" section of DPS.
 
-Then in the file `<sdk_path>/apps/talaria_two_azure/examples/inno_os/prov_dev_client_ll_sample/main/prov_dev_client_ll_sample.c`, searching for `id_scope` you will find the code :
+Then in the file `<sdk_path>/apps/talaria_two_azure/examples/sdk_2.x/prov_dev_client_ll_sample/main/prov_dev_client_ll_sample.c`, searching for `id_scope` you will find the code :
 
 ```
 static const char* id_scope = "XXXXXXXXXXX";
@@ -268,7 +268,7 @@ For example
 static const char* id_scope = "0ne001E4235";
 ```
 
-The name of the Enrollment Entity we created in previous step is to be populated in below portion of file `<sdk_path>/apps/talaria_two_azure/examples/inno_os/prov_dev_client_ll_sample/main/custom_hsm.c`.
+The name of the Enrollment Entity we created in previous step is to be populated in below portion of file `<sdk_path>/apps/talaria_two_azure/examples/sdk_2.x/prov_dev_client_ll_sample/main/custom_hsm.c`.
 ```
 static const char* const COMMON_NAME = "XXYYZZ";
 ```
@@ -279,10 +279,10 @@ For Example --
 static const char* const COMMON_NAME = "InnoProvServiceECC";
 ```
 
-In the file `<sdk_path>/apps/talaria_two_azure/examples/inno_os/prov_dev_client_ll_sample/main/certs/certs.c`, content of `leaf_cert_pem_start[]` and `leaf_pv_key_pem_start[]` are to be populated with the contents from 
+In the file `<sdk_path>/apps/talaria_two_azure/examples/sdk_2.x/prov_dev_client_ll_sample/main/certs/certs.c`, content of `leaf_cert_pem_start[]` and `leaf_pv_key_pem_start[]` are to be populated with the contents from 
 `leaf_private_key.pem` and `leaf_certificate.pem` we created earlier.
 
-The way to populate this is shown in the example file `<sdk_path>/apps/talaria_two_azure/examples/inno_os/prov_dev_client_ll_sample/main/certs/ecc_example_certs.c`
+The way to populate this is shown in the example file `<sdk_path>/apps/talaria_two_azure/examples/sdk_2.x/prov_dev_client_ll_sample/main/certs/ecc_example_certs.c`
 
 Confirm that these needed changes are in place and files saved
 Now, do a `make clean` and then run `make build_type=prov_build_with_x509` for generating `Azure IoT Hub Device Provisioning Service Sample` provisioning build with HSM_TYPE_X509.
@@ -421,8 +421,8 @@ All this, means the provisioning using X.509 CA Certificate based device enrollm
 	static const char* const COMMON_NAME = "InnoProvServiceRSA";
 	```
 	We will have to use the content from `leaf_private_key.pem` and `leaf_certificate.pem` generated from RSA specific steps to populate the file--
-	`<sdk_path>/apps/talaria_two_azure/examples/inno_os/prov_dev_client_ll_sample/main/certs/certs.c`.
-	(Similar to the way shown in the example file `<sdk_path>/apps/talaria_two_azure/examples/inno_os/prov_dev_client_ll_sample/main/certs/rsa_example_certs.c`.)
+	`<sdk_path>/apps/talaria_two_azure/examples/sdk_2.x/prov_dev_client_ll_sample/main/certs/certs.c`.
+	(Similar to the way shown in the example file `<sdk_path>/apps/talaria_two_azure/examples/sdk_2.x/prov_dev_client_ll_sample/main/certs/rsa_example_certs.c`.)
 
 	Please Note : All other steps not specifically detailed in this RSA specific section are exactly the same as already covered in the ECC example in great details.
 	(for example populating `id_scope` in device config section, etc). Only the key and certificate generation and the names we use for examples are changed here.

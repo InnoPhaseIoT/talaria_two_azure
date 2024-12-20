@@ -21,7 +21,7 @@ Output will be similar to:
 }
 ```
 
-- open the file `<sdk_path>/apps/talaria_two_azure/examples/freertos/iothub_devicetwin_and_methods_sample/main/iothub_client_device_twin_and_methods_sample.c`
+- open the file `<sdk_path>/apps/talaria_two_azure/examples/sdk_3.x/iothub_devicetwin_and_methods_sample/main/iothub_client_device_twin_and_methods_sample.c`
 
 - In this file, populate the macro 'CONFIG_IOTHUB_CONNECTION_STRING' (shown below) with the connection string of your device copied in previous steps.
 
