@@ -45,14 +45,14 @@ azure_sdk_provisioning_client_src=$(T2AZURE_LOC)/azure-iot-sdk-c/provisioning_cl
 azure_sdk_provisioning_client_adapters=$(T2AZURE_LOC)/azure-iot-sdk-c/provisioning_client/adapters/
 azure_sdk_provisioning_client_deps=$(T2AZURE_LOC)/azure-iot-sdk-c/provisioning_client/deps/utpm/deps/c-utility/src/
 
-azure_sdk_pal=$(T2AZURE_LOC)/pal/freertos/src/
+azure_sdk_pal=$(T2AZURE_LOC)/pal/sdk_3.x/src/
 
 commonIncs = \
         -I$(T2AZURE_LOC)/azure-iot-sdk-c/c-utility/inc \
         -I$(T2AZURE_LOC)/azure-iot-sdk-c/c-utility/pal/generic \
         -I$(T2AZURE_LOC)/azure-iot-sdk-c/c-utility/deps/azure-macro-utils-c/inc \
         -I$(T2AZURE_LOC)/azure-iot-sdk-c/c-utility/deps/umock-c/inc\
-        -I$(T2AZURE_LOC)/pal/freertos/inc
+        -I$(T2AZURE_LOC)/pal/sdk_3.x/inc
 
 iotclientIncs = \
         -I$(T2AZURE_LOC)/azure-iot-sdk-c/iothub_client/inc \
@@ -114,6 +114,30 @@ CFLAGS += -DDONT_USE_UPLOADTOBLOB
 
 ##### enabling this will make a less sized release build and logging will be disabled #####
 #CFLAGS += -DNO_LOGGING
+
+
+#### CPPFLAGS provisioning section #####
+
+ifeq ($(build_type),prov_build_with_symm_key)
+
+CPPFLAGS += -DUSE_PROV_MODULE
+CPPFLAGS += -DHSM_TYPE_SYMM_KEY
+#CPPFLAGS += -DHSM_TYPE_X509
+#CPPFLAGS += -DHSM_TYPE_SAS_TOKEN
+
+else
+
+    ifeq ($(build_type),prov_build_with_x509)
+    CPPFLAGS += -DUSE_PROV_MODULE
+    #CPPFLAGS += -DHSM_TYPE_SYMM_KEY
+    CPPFLAGS += -DHSM_TYPE_X509
+    #CPPFLAGS += -DHSM_TYPE_SAS_TOKEN
+
+    else
+    # any other flag specific to sample 1 and sample 2 can be kept here.
+    endif
+endif
+
 
 CFLAGS += -Wno-maybe-uninitialized
 $(info CFLAGS = $(CFLAGS))
@@ -226,10 +250,10 @@ libazure_iot_sdk_t2_OBJS := \
 
 $(OUTDIR)/${lib_azure_iot_sdk_t2_path}/libazure_iot_sdk_t2.a: $(libazure_iot_sdk_t2_OBJS)
 $(OUTDIR)/${lib_azure_iot_sdk_t2_path}/libazure_iot_sdk_t2.a: lib_objs = $(libazure_iot_sdk_t2_OBJS)
-
+ 
 libazure_iot_sdk_t2_pal_OBJS := \
         $(addprefix $(OUTDIR)/,${azure_iot_srcs_pal})
-
+ 
 $(OUTDIR)/${lib_azure_iot_sdk_t2_pal_path}/libazure_iot_sdk_t2_pal.a: $(libazure_iot_sdk_t2_pal_OBJS)
 $(OUTDIR)/${lib_azure_iot_sdk_t2_pal_path}/libazure_iot_sdk_t2_pal.a: lib_objs = $(libazure_iot_sdk_t2_pal_OBJS)
 
@@ -237,9 +261,9 @@ $(OUTDIR)/${lib_azure_iot_sdk_t2_pal_path}/libazure_iot_sdk_t2_pal.a: lib_objs =
 
 # Reference -- add the application's code paths here 
 
-APP := iothub_client_mqtt_sample.elf
+APP := prov_dev_client_ll_sample.elf
 
-app_src=$(T2AZURE_LOC)/examples/freertos/iothub_client_sample_mqtt/main
+app_src=$(T2AZURE_LOC)/examples/sdk_3.x/prov_dev_client_ll_sample/main
 
 CFLAGS += -I${app_src}
 
@@ -248,13 +272,15 @@ LDFLAGS += -L$(OUTDIR)/${lib_azure_iot_sdk_t2_path}
 LDFLAGS += -L$(OUTDIR)/${lib_azure_iot_sdk_t2_pal_path}
 LDFLAGS += --no-gc-sections 
 
-# #mqtt client sample app code
-IOTHUB_CLIENT_MQTT_SAMPLE_SRC_FILES +=  \
+# prov dev client ll sample app code
+PROV_DEV_CLIENT_LL_SAMPLE_SRC_FILES +=  \
         ${app_src}/azure_main.o \
-        ${app_src}/iothub_client_sample_mqtt.o
+        ${app_src}/custom_hsm.o \
+        ${app_src}/certs/certs.o \
+        ${app_src}/prov_dev_client_ll_sample.o
  
-IOTHUB_CLIENT_MQTT_SAMPLE_OBJ_FILES := $(addprefix $(OUTDIR), $(IOTHUB_CLIENT_MQTT_SAMPLE_SRC_FILES:%.c=%.o))
-$(OUTDIR)/$(APP)   :  $(IOTHUB_CLIENT_MQTT_SAMPLE_OBJ_FILES)
+PROV_DEV_CLIENT_LL_SAMPLE_OBJ_FILES := $(addprefix $(OUTDIR), $(PROV_DEV_CLIENT_LL_SAMPLE_SRC_FILES:%.c=%.o))
+$(OUTDIR)/$(APP)   :  $(PROV_DEV_CLIENT_LL_SAMPLE_OBJ_FILES)
 
 ALL_APPS := $(APP)
 ALL_APPS := $(ALL_APPS) $(ALL_APPS:%.elf=%.elf.strip)

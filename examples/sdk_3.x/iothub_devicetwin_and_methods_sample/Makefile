@@ -1,18 +1,23 @@
+TOP=../../../../..
+TOP := $(abspath $(TOP))
+-include $(TOP)/embedded_apps.mak
+SDK_DIR ?= $(TOP)
+ROOT_DIR := $(SDK_DIR)
 
-ROOT_LOC=../../../..
--include ${ROOT_LOC}/embedded_apps.mak
-SDK_DIR ?= $(ROOT_LOC)
-include $(ROOT_LOC)/build.mak
-include $(SDK_DIR)/conf/sdk.mak
+# basic rules and variables
+include $(ROOT_DIR)/build/rules.mak
+include $(TOP)/build.mak
 
-targets= $(addprefix $(objdir)/,$(apps))
-create_azure_iot_libs= create_lib_folder $(addprefix $(objdir)/,$(azure_iot_libs))
-$(targets) : $(COMMON_FILES)
+LIBS = -lwifi -lrfdrv -llwip2 -lmbedtls -lsupplicant -ldragonfly -lfreertos
+LIBS += -lazure_iot_sdk_t2 -lazure_iot_sdk_t2_pal -lcomponents
+
 
 all:
 	$(MAKE) libcomponents
 	$(MAKE) $(create_azure_iot_libs)
-	$(MAKE) $(targets)
+	$(MAKE) $(TARGETS)
+
+create_azure_iot_libs= create_lib_folder $(addprefix $(OUTDIR)/,$(azure_iot_libs))
 
 lib_azure_iot_sdk_t2_path=lib/azure_iot_sdk_t2/
 lib_azure_iot_sdk_t2_pal_path=lib/azure_iot_sdk_t2_pal/
@@ -22,11 +27,12 @@ azure_iot_libs = \
         ${lib_azure_iot_sdk_t2_pal_path}/libazure_iot_sdk_t2_pal.a
 
 create_lib_folder:
-	mkdir -p $(objdir)/${lib_azure_iot_sdk_t2_path}
-	mkdir -p $(objdir)/${lib_azure_iot_sdk_t2_pal_path}
+	mkdir -p $(OUTDIR)/${lib_azure_iot_sdk_t2_path}
+	mkdir -p $(OUTDIR)/${lib_azure_iot_sdk_t2_pal_path}
 
-T2AZURE_LOC = $(realpath $(ROOT_LOC))/apps/talaria_two_azure
 
+T2AZURE_LOC = $(TOP)/apps/talaria_two_azure
+$(info T2AZURE_LOC=$(T2AZURE_LOC))
 azure_sdk_c-utility_src=$(T2AZURE_LOC)/azure-iot-sdk-c/c-utility/src/
 azure_sdk_c-utility_pal=$(T2AZURE_LOC)/azure-iot-sdk-c/c-utility/pal/
 azure_sdk_c-utility_adapters=$(T2AZURE_LOC)/azure-iot-sdk-c/c-utility/adapters/
@@ -39,14 +45,14 @@ azure_sdk_provisioning_client_src=$(T2AZURE_LOC)/azure-iot-sdk-c/provisioning_cl
 azure_sdk_provisioning_client_adapters=$(T2AZURE_LOC)/azure-iot-sdk-c/provisioning_client/adapters/
 azure_sdk_provisioning_client_deps=$(T2AZURE_LOC)/azure-iot-sdk-c/provisioning_client/deps/utpm/deps/c-utility/src/
 
-azure_sdk_pal=$(T2AZURE_LOC)/pal/inno_os/src/
+azure_sdk_pal=$(T2AZURE_LOC)/pal/sdk_3.x/src/
 
 commonIncs = \
-        -I$(T2AZURE_LOC)/pal/inno_os/inc \
-        -I$(T2AZURE_LOC)/azure-iot-sdk-c/c-utility/pal/generic \
         -I$(T2AZURE_LOC)/azure-iot-sdk-c/c-utility/inc \
+        -I$(T2AZURE_LOC)/azure-iot-sdk-c/c-utility/pal/generic \
         -I$(T2AZURE_LOC)/azure-iot-sdk-c/c-utility/deps/azure-macro-utils-c/inc \
-        -I$(T2AZURE_LOC)/azure-iot-sdk-c/c-utility/deps/umock-c/inc
+        -I$(T2AZURE_LOC)/azure-iot-sdk-c/c-utility/deps/umock-c/inc\
+        -I$(T2AZURE_LOC)/pal/sdk_3.x/inc
 
 iotclientIncs = \
         -I$(T2AZURE_LOC)/azure-iot-sdk-c/iothub_client/inc \
@@ -82,13 +88,25 @@ provClientIncs = \
         -I$(T2AZURE_LOC)/azure-iot-sdk-c/umqtt/inc \
         -I$(T2AZURE_LOC)/azure-iot-sdk-c/deps/parson \
         -I$(T2AZURE_LOC)/azure-iot-sdk-c/deps/uhttp/inc \
-        -I$(T2AZURE_LOC)/azure-iot-sdk-c/umqtt/inc/azure_umqtt_-I$(T2AZURE_LOC)/
-CPPFLAGS +=${commonIncs}
-CPPFLAGS +=${iotclientIncs}
-CPPFLAGS +=${serializerIncs}
-CPPFLAGS +=${umqttIncs}
-CPPFLAGS +=${provClientIncs}
-CPPFLAGS +=-Iazure-iot-sdk-c/c-utility/pal/generic
+        -I$(T2AZURE_LOC)/azure-iot-sdk-c/umqtt/inc/azure_umqtt_c
+
+sdk_include = \
+        -I$(TOP)/components/utils/inc \
+        -I$(SDK_DIR)/include \
+        -I$(SDK_DIR)/include/arm \
+        -I$(SDK_DIR)/include/libc/include \
+        -I$(SDK_DIR)/FreeRTOS-Kernel/include \
+        -I$(SDK_DIR)/FreeRTOS-Kernel/portable/GCC/ARM_CM3 \
+        -I$(SDK_DIR)/include/innos_osal/inc \
+        -I/usr/gcc-arm-none-eabi-10.3-2021.10/arm-none-eabi/include
+
+CFLAGS +=${sdk_include}
+CFLAGS +=${commonIncs}
+CFLAGS +=${iotclientIncs}
+CFLAGS +=${serializerIncs}
+CFLAGS +=${umqttIncs}
+CFLAGS +=${provClientIncs}
+CFLAGS +=-Iazure-iot-sdk-c/c-utility/pal/generic
 
 ##### must use this option if http transport is not supported #####
 ##### bulding sdk for PC, the cmake build autoenables this if the http is disabled #####
@@ -97,32 +115,8 @@ CFLAGS += -DDONT_USE_UPLOADTOBLOB
 ##### enabling this will make a less sized release build and logging will be disabled #####
 #CFLAGS += -DNO_LOGGING
 
-
-#### CPPFLAGS provisioning section #####
-
-ifeq ($(build_type),prov_build_with_symm_key)
-
-CPPFLAGS += -DUSE_PROV_MODULE
-CPPFLAGS += -DHSM_TYPE_SYMM_KEY
-#CPPFLAGS += -DHSM_TYPE_X509
-#CPPFLAGS += -DHSM_TYPE_SAS_TOKEN
-
-else
-
-    ifeq ($(build_type),prov_build_with_x509)
-    CPPFLAGS += -DUSE_PROV_MODULE
-    #CPPFLAGS += -DHSM_TYPE_SYMM_KEY
-    CPPFLAGS += -DHSM_TYPE_X509
-    #CPPFLAGS += -DHSM_TYPE_SAS_TOKEN
-
-    else
-    # any other flag specific to sample 1 and sample 2 can be kept here.
-    endif
-endif
-
-
 CFLAGS += -Wno-maybe-uninitialized
-
+$(info CFLAGS = $(CFLAGS))
 #SRCS_C_UTIL
 azure_iot_srcs_c_util = \
         ${azure_sdk_c-utility_src}azure_base32.o \
@@ -224,94 +218,50 @@ azure_iot_srcs_provisioning_client = \
         ${azure_sdk_provisioning_client_adapters}hsm_client_data.o
 
 libazure_iot_sdk_t2_OBJS := \
-        $(addprefix $(objdir)/,${azure_iot_srcs_c_util}) \
-    	$(addprefix $(objdir)/,${azure_iot_srcs_iothub_client}) \
-        $(addprefix $(objdir)/,${azure_iot_srcs_serializer}) \
-	    $(addprefix $(objdir)/,${azure_iot_srcs_umqtt}) \
-        $(addprefix $(objdir)/,${azure_iot_srcs_provisioning_client})
+        $(addprefix $(OUTDIR)/,${azure_iot_srcs_c_util}) \
+    	$(addprefix $(OUTDIR)/,${azure_iot_srcs_iothub_client}) \
+        $(addprefix $(OUTDIR)/,${azure_iot_srcs_serializer}) \
+	    $(addprefix $(OUTDIR)/,${azure_iot_srcs_umqtt}) \
+        $(addprefix $(OUTDIR)/,${azure_iot_srcs_provisioning_client})
 
-$(objdir)/${lib_azure_iot_sdk_t2_path}/libazure_iot_sdk_t2.a: $(libazure_iot_sdk_t2_OBJS)
-$(objdir)/${lib_azure_iot_sdk_t2_path}/libazure_iot_sdk_t2.a: lib_objs = $(libazure_iot_sdk_t2_OBJS)
-
+$(OUTDIR)/${lib_azure_iot_sdk_t2_path}/libazure_iot_sdk_t2.a: $(libazure_iot_sdk_t2_OBJS)
+$(OUTDIR)/${lib_azure_iot_sdk_t2_path}/libazure_iot_sdk_t2.a: lib_objs = $(libazure_iot_sdk_t2_OBJS)
+ 
 libazure_iot_sdk_t2_pal_OBJS := \
-        $(addprefix $(objdir)/,${azure_iot_srcs_pal})
+        $(addprefix $(OUTDIR)/,${azure_iot_srcs_pal})
+ 
+$(OUTDIR)/${lib_azure_iot_sdk_t2_pal_path}/libazure_iot_sdk_t2_pal.a: $(libazure_iot_sdk_t2_pal_OBJS)
+$(OUTDIR)/${lib_azure_iot_sdk_t2_pal_path}/libazure_iot_sdk_t2_pal.a: lib_objs = $(libazure_iot_sdk_t2_pal_OBJS)
 
-$(objdir)/${lib_azure_iot_sdk_t2_pal_path}/libazure_iot_sdk_t2_pal.a: $(libazure_iot_sdk_t2_pal_OBJS)
-$(objdir)/${lib_azure_iot_sdk_t2_pal_path}/libazure_iot_sdk_t2_pal.a: lib_objs = $(libazure_iot_sdk_t2_pal_OBJS)
+#------------------------------------------------------Application-Specific Section------    ----------------------------------------------------#
 
+# Reference -- add the application's code paths here 
 
-#------------------------------------------------------Application-Specific Section----------------------------------------------------------#
+APP := iothub_devicetwin_and_methods_sample.elf
 
-# Reference -- add the application's .elf and .elf.strip targets here
+app_src=$(T2AZURE_LOC)/examples/sdk_3.x/iothub_devicetwin_and_methods_sample/main
 
-ifeq ($(build_type),prov_build_with_symm_key)
-apps = prov_dev_client_ll_sample.elf prov_dev_client_ll_sample.elf.strip 
-else
-
-    ifeq ($(build_type),prov_build_with_x509)
-    apps = prov_dev_client_ll_sample.elf prov_dev_client_ll_sample.elf.strip 
-
-    else
-    apps = iothub_client_mqtt_sample.elf iothub_client_mqtt_sample.elf.strip \
-            iothub_devicetwin_and_methods_sample.elf iothub_devicetwin_and_methods_sample.elf.strip
-    endif
-endif
-
-# Reference -- add the application's code paths here
-azure_iothub_client_sample_mqtt=$(T2AZURE_LOC)/examples/inno_os/iothub_client_sample_mqtt/main/
-azure_iothub_devicetwin_and_methods_sample=$(T2AZURE_LOC)/examples/inno_os/iothub_devicetwin_and_methods_sample/main/
-azure_iothub_prov_dev_client_ll_sample=$(T2AZURE_LOC)/examples/inno_os/prov_dev_client_ll_sample/main/
-
-# Reference -- add the application's include paths here
+CFLAGS += -I${app_src}
 
 # Reference -- linker directives
-LDFLAGS += -L$(objdir)/${lib_azure_iot_sdk_t2_path}
-LDFLAGS += -L$(objdir)/${lib_azure_iot_sdk_t2_pal_path}
-LDFLAGS += --no-gc-sections
+LDFLAGS += -L$(OUTDIR)/${lib_azure_iot_sdk_t2_path}
+LDFLAGS += -L$(OUTDIR)/${lib_azure_iot_sdk_t2_pal_path}
+LDFLAGS += --no-gc-sections 
 
-# Reference -- add the application's source codes here
+# Devicetwin and methods sample app code
+IOTHUB_DEVICETWIN_AND_METHODS_SAMPLE_SRC_FILES +=  \
+        ${app_src}/azure_main.o \
+        ${app_src}/iothub_client_device_twin_and_methods_sample.o
+ 
+IOTHUB_DEVICETWIN_AND_METHODS_SAMPLE_OBJ_FILES := $(addprefix $(OUTDIR), $(IOTHUB_DEVICETWIN_AND_METHODS_SAMPLE_SRC_FILES:%.c=%.o))
+$(OUTDIR)/$(APP)   :  $(IOTHUB_DEVICETWIN_AND_METHODS_SAMPLE_OBJ_FILES)
 
-#mqtt client sample app code
-iothub_client_mqtt_sample_obj = \
-        ${azure_iothub_client_sample_mqtt}azure_main.o \
-        ${azure_iothub_client_sample_mqtt}iothub_client_sample_mqtt.o
-
-iothub_client_mqtt_sample-virt = yes
-
-#add the libraries used by the Application, including azure_iot libraries created
-$(objdir)/iothub_client_mqtt_sample.elf:LIBS = \
-        -lcomponents -lazure_iot_sdk_t2 -lazure_iot_sdk_t2_pal -lmbedtls -lwifi -llwip2 -limath -linnobase -ldragonfly
-$(objdir)/iothub_client_mqtt_sample.elf: $(addprefix $(objdir)/,${iothub_client_mqtt_sample_obj})
-
-#device twin and method sample app code
-iothub_devicetwin_and_methods_sample_obj = \
-        ${azure_iothub_devicetwin_and_methods_sample}azure_main.o \
-        ${azure_iothub_devicetwin_and_methods_sample}iothub_client_device_twin_and_methods_sample.o
-
-iothub_devicetwin_and_methods_sample-virt = yes
-
-#add the libraries used by the Application, including azure_iot libraries created
-$(objdir)/iothub_devicetwin_and_methods_sample.elf:LIBS = \
-        -lcomponents -lazure_iot_sdk_t2 -lazure_iot_sdk_t2_pal -lmbedtls -lwifi -llwip2 -limath -linnobase -ldragonfly
-$(objdir)/iothub_devicetwin_and_methods_sample.elf: $(addprefix $(objdir)/,${iothub_devicetwin_and_methods_sample_obj})
-
-#device provisioning client sample app code
-prov_dev_client_ll_sample_obj = \
-        ${azure_iothub_prov_dev_client_ll_sample}azure_main.o \
-        ${azure_iothub_prov_dev_client_ll_sample}custom_hsm.o \
-        ${azure_iothub_prov_dev_client_ll_sample}certs/certs.o \
-        ${azure_iothub_prov_dev_client_ll_sample}prov_dev_client_ll_sample.o
-
-prov_dev_client_ll_sample-virt = yes
-
-$(objdir)/prov_dev_client_ll_sample.elf:LIBS = \
-        -lcomponents -lazure_iot_sdk_t2 -lazure_iot_sdk_t2_pal -lmbedtls -lwifi -llwip2 -limath -linnobase -ldragonfly
-$(objdir)/prov_dev_client_ll_sample.elf: $(addprefix $(objdir)/,${prov_dev_client_ll_sample_obj})
-
+ALL_APPS := $(APP)
+ALL_APPS := $(ALL_APPS) $(ALL_APPS:%.elf=%.elf.strip)
+TARGETS  := $(addprefix $(OUTDIR)/,$(ALL_APPS))
 #--------------------------------------------------------------------------------------------------------------------------------------------#
 
 clean:
-	rm -rf $(objdir)
+	rm -rf $(OUTDIR)
 
--include ${DEPS}
-
+include $(BUILD_DIR)/sdk.mak
